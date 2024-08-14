@@ -9,8 +9,10 @@ include(cmake/CompileOptions.cmake)
 include(cmake/Sanitize.cmake)
 include(cmake/Platform.cmake)
 include(cmake/Development.cmake)
-# include(cmake/Dependencies.cmake)
+include(cmake/Dependencies.cmake)
 
+add_subdirectory(axis)
 add_subdirectory(accord)
+
 add_subdirectory(playground)
 

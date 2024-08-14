@@ -1,6 +1,11 @@
 #pragma once
-#include <iostream>
+#include <fmt/core.h>
+#include <axis/core/defer.hpp>
+
 
 inline auto PrintHello() -> void {
-    std::cout << "Hello, world!" << std::endl;
+   AXIS_DEFER {
+    fmt::println("Defered!");
+   };
+    fmt::println("Hello!");
 }
