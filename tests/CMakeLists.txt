@@ -16,6 +16,7 @@ target_link_libraries(
   axis
   accord
   GTest::gtest_main
+  GTest::gmock_main
 )
 
 include(GoogleTest)

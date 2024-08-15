@@ -1,7 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <cstddef>
+#include <iterator>
 
 namespace axis {
 
@@ -25,8 +25,8 @@ struct IntrusiveListNode {
 
   auto LinkBefore(IntrusiveListNode* next) noexcept -> void {
     prev_ = next->prev_;
-    next_ = next;
     prev_->next_ = this;
+    next_ = next;
     next->prev_ = this;
   }
 
@@ -60,7 +60,14 @@ class IntrusiveList final : private IntrusiveListNode<T, Tag> {
     using value_type = Item;                                    // NOLINT
     using difference_type = ptrdiff_t;                          // NOLINT
     using pointer = value_type*;                                // NOLINT
-    using reference = value_type*;                              // NOLINT
+    using reference = value_type&;                              // NOLINT
+
+    IteratorImpl() = default;
+    IteratorImpl(const IteratorImpl& it) = default;
+    IteratorImpl(IteratorImpl&& it) = default;
+    auto operator=(const IteratorImpl& it) -> IteratorImpl& = default;
+    auto operator=(IteratorImpl&& it) -> IteratorImpl& = default;
+    ~IteratorImpl() = default;
 
     explicit IteratorImpl(Node* val) noexcept
         : current_(val) {
@@ -139,12 +146,12 @@ class IntrusiveList final : private IntrusiveListNode<T, Tag> {
 
   IntrusiveList(IntrusiveList&& other) noexcept {
     this->next_ = this->prev_ = this;
-    std::swap(*this, other);
+    Append(other);
   };
   auto operator=(IntrusiveList&& other) noexcept -> IntrusiveList& {
     while (PopBack()) {
     }
-    std::swap(*this, other);
+    Append(other);
     return *this;
   }
 
@@ -168,7 +175,7 @@ class IntrusiveList final : private IntrusiveListNode<T, Tag> {
     elem->LinkBefore(this->next_);
   }
 
-  auto PopBack [[nodiscard]] () -> T* {
+  auto PopBack() -> T* {
     if (IsEmpty()) {
       return nullptr;
     }
@@ -176,13 +183,28 @@ class IntrusiveList final : private IntrusiveListNode<T, Tag> {
     back->Unlink();
     return back->Item();
   }
-  auto PopFront [[nodiscard]] () -> T* {
+  auto PopFront() -> T* {
     if (IsEmpty()) {
       return nullptr;
     }
     auto* front = this->next_;
     front->Unlink();
     return front->Item();
+  }
+
+  auto Append(IntrusiveList& other) noexcept -> void {
+    auto* other_front = other.next_;
+    auto* other_back = other.prev_;
+
+    other_back->next_ = this;
+    other_front->prev_ = this->prev_;
+
+    auto* back = this->prev_;
+
+    this->prev_ = other_back;
+    back->next_ = other_front;
+
+    other.prev_ = other.next_ = &other;
   }
 };
 }  // namespace axis
