@@ -14,5 +14,8 @@ include(cmake/Dependencies.cmake)
 add_subdirectory(axis)
 add_subdirectory(accord)
 
+add_subdirectory(tests)
+
+
 add_subdirectory(playground)
 
