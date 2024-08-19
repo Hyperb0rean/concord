@@ -16,6 +16,5 @@ add_subdirectory(accord)
 
 add_subdirectory(tests)
 
-
 add_subdirectory(playground)
 

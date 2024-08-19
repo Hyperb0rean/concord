@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../type.hpp"
+#include <axis/monad/result/type.hpp>
+#include <axis/monad/trait/value_of.hpp>
 
 namespace axis::monad {
 
@@ -18,8 +19,15 @@ struct [[nodiscard]] OrElse {
   OrElse(const OrElse&) = delete;
   auto operator=(const OrElse&) -> OrElse& = delete;
 
-  template <typename T>
-  auto Pipe(Result<T> r) -> Result<T> {
+  template <typename Monad>
+  requires IsResult<Monad>
+  auto Pipe(Monad r) -> Result<ValueOf<Monad>> {
+    return std::move(r).or_else(user);
+  }
+
+  template <typename Monad>
+  requires IsMaybe<Monad>
+  auto Pipe(Monad r) -> Maybe<ValueOf<Monad>> {
     return std::move(r).or_else(user);
   }
 };
@@ -27,7 +35,7 @@ struct [[nodiscard]] OrElse {
 }  // namespace combinator
 
 /*
- * Result<T> -> (Error -> Result<T>) -> Result<T>
+ * Monad<T> -> (Error | Nothing -> Monad<T>) -> Monad<T>
  *
  * Usage:
  *

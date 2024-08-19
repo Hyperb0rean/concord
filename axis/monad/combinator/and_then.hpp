@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../type.hpp"
-#include "../trait.hpp"
+#include <axis/monad/result/type.hpp>
+#include <axis/monad/trait/value_of.hpp>
+#include <axis/monad/trait/is_result.hpp>
+#include <axis/monad/trait/is_maybe.hpp>
 
 #include <type_traits>  // std::invoke_result_t
 
@@ -24,8 +26,15 @@ struct [[nodiscard]] AndThen {
   template <typename T>
   using U = ValueOf<std::invoke_result_t<F, T>>;
 
-  template <typename T>
-  auto Pipe(Result<T> r) -> Result<U<T>> {
+  template <typename Monad>
+  requires IsResult<Monad>
+  auto Pipe(Monad r) -> Result<U<ValueOf<Monad>>> {
+    return std::move(r).and_then(user);
+  }
+
+  template <typename Monad>
+  requires IsMaybe<Monad>
+  auto Pipe(Monad r) -> Maybe<U<ValueOf<Monad>>> {
     return std::move(r).and_then(user);
   }
 };
@@ -33,7 +42,7 @@ struct [[nodiscard]] AndThen {
 }  // namespace combinator
 
 /*
- * Result<T> -> (T -> Result<U>) -> Result<U>
+ * Monad<T> -> (T -> Monad<U>) -> Monad<U>
  *
  * Usage:
  *

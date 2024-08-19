@@ -1,10 +1,10 @@
 #pragma once
 
 #include <type_traits>
-#include "type.hpp"
+#include <axis/monad/result/type.hpp>
 
 namespace axis::monad {
-namespace match {
+namespace trait {
 
 template <typename T>
 struct IsResult {
@@ -17,24 +17,12 @@ struct IsResult<Result<T>> {
   static constexpr bool kValue = true;
   using Type = std::true_type;
 };
+}  // namespace trait
 
 template <typename T>
-struct ValueOf;
+using IsResultType = typename trait::IsResult<T>::Type;
 
 template <typename T>
-struct ValueOf<Result<T>> {
-  using Type = T;
-};
-
-}  // namespace match
-
-template <typename T>
-using IsResultType = typename match::IsResult<T>::Type;
-
-template <typename T>
-concept IsResult = match::IsResult<T>::kValue;
-
-template <typename Result>
-using ValueOf = typename match::ValueOf<Result>::Type;
+concept IsResult = trait::IsResult<T>::kValue;
 
 }  // namespace axis::monad
