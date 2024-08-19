@@ -10,7 +10,14 @@ if(DEFINED UNIX AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(LINUX true)
 endif()
 
+set(WIN false)
+if(WIN32)
+    set(WIN true)
+endif()
+
 add_definitions(-DUNIX=${UNIX})
 add_definitions(-DAPPLE=${APPLE})
 add_definitions(-DLINUX=${LINUX})
+add_definitions(-DWIN=${WIN})
+
 

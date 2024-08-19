@@ -2,7 +2,8 @@
 
 #include <axis/monad/result/type.hpp>
 #include <axis/monad/trait/value_of.hpp>
-
+#include <axis/monad/trait/is_result.hpp>
+#include <axis/monad/trait/is_maybe.hpp>
 #include <type_traits>  // std::invoke_result_t
 
 namespace axis::monad {
