@@ -1,10 +1,19 @@
 #pragma once
 
-#include <cstddef>
+#include <atomic>
 #include <cstdint>
+namespace accord::syscall {
 
-namespace accord::syscall::detail {
-auto WaitTimed(uint32_t* addr, uint32_t old, uint32_t millis) -> int;
-auto Wait(uint32_t* addr, uint32_t old) -> int;
-auto Wake(uint32_t* addr, size_t count) -> int;
-}  // namespace accord::syscall::detail
+auto Wait(std::atomic<uint32_t>* atomic,  //
+          uint32_t old,                   //
+          std::memory_order mo = std::memory_order::seq_cst) -> void;
+
+auto WaitTimed(std::atomic<uint32_t>* atomic,      //
+               uint32_t old,                       //
+               std::chrono::milliseconds timeout,  //
+               std::memory_order mo = std::memory_order::seq_cst) -> bool;
+
+auto WakeOne(std::atomic<uint32_t>* atomic) -> void;
+auto WakeAll(std::atomic<uint32_t>* atomic) -> void;
+
+}  // namespace accord::syscall
