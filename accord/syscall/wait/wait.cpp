@@ -1,5 +1,13 @@
 
 #include "platform/wait.hpp"
+#ifdef LINUX
+#include "platform/linux.hpp"
+#elif APPLE
+#include "platform/apple.hpp"
+#else
+#include "platform/windows.hpp"
+#endif
+
 #include "wait.hpp"
 
 namespace accord::syscall {

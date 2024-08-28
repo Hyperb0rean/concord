@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 #include <cstdint>
 
 // https://graphics.stanford.edu/~seander/bithacks.html

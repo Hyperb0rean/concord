@@ -1,7 +1,6 @@
 #pragma once
 #include <ctime>
 #include "wait.hpp"
-#ifdef LINUX
 
 #include <unistd.h>
 #include <sys/syscall.h>
@@ -33,4 +32,3 @@ auto Wake(uint32_t* addr, size_t count) -> int {
 }
 
 }  // namespace accord::syscall::detail
-#endif

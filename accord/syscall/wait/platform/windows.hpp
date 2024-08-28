@@ -1,7 +1,5 @@
 #pragma once
 #include "wait.hpp"
-
-#ifdef WIN
 #include "synchapi.h"
 
 namespace accord::syscall::detail {
@@ -19,5 +17,3 @@ auto Wake(uint32_t* addr, size_t count) -> int {
 }
 
 }  // namespace accord::syscall::detail
-
-#endif

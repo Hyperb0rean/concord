@@ -1,7 +1,6 @@
 #pragma once
 #include "wait.hpp"
 
-#ifdef APPLE
 // NOLINTNEXTLINE
 extern "C" int __ulock_wait(
     uint32_t operation, void* addr, uint64_t value,
@@ -30,5 +29,3 @@ auto Wake(uint32_t* addr, size_t count) -> int {
 }
 
 }  // namespace accord::syscall::detail
-
-#endif
