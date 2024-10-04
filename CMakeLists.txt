@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(accord)
+project(concord)
 
 include(cmake/Logging.cmake)
 include(cmake/Ccache.cmake)
@@ -12,7 +12,7 @@ include(cmake/Development.cmake)
 include(cmake/Dependencies.cmake)
 
 add_subdirectory(axis)
-add_subdirectory(accord)
+add_subdirectory(concord)
 
 add_subdirectory(tests)
 

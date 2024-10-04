@@ -14,7 +14,7 @@ add_executable(tests ${TESTS_SOURCES})
 target_link_libraries(
   tests
   axis
-  accord
+  concord
   GTest::gtest_main
   GTest::gmock_main
 )

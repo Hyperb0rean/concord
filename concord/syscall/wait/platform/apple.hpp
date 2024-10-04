@@ -13,7 +13,7 @@ extern "C" int __ulock_wake(uint32_t operation, void* addr,
 #define UL_COMPARE_AND_WAIT 1
 #define ULF_WAKE_ALL 0x00000100
 
-namespace accord::syscall::detail {
+namespace concord::syscall::detail {
 
 auto WaitTimed(uint32_t* addr, uint32_t expected, uint32_t millis) -> int {
   return __ulock_wait(UL_COMPARE_AND_WAIT, addr, expected, millis * 1000);
@@ -28,4 +28,4 @@ auto Wake(uint32_t* addr, size_t count) -> int {
                       addr, 0);
 }
 
-}  // namespace accord::syscall::detail
+}  // namespace concord::syscall::detail

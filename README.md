@@ -1,2 +1,2 @@
-# accord
-Advanced Concurrency Control and Resource Distribution
+# concord
+Concurrent Cords

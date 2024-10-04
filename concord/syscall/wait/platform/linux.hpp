@@ -14,7 +14,7 @@ int futex(unsigned int* uaddr, int op, int val, const struct timespec* timeout,
 }
 }  // namespace
 
-namespace accord::syscall::detail {
+namespace concord::syscall::detail {
 auto WaitTimed(uint32_t* addr, uint32_t old, uint32_t millis) -> int {
   struct timespec timeout;
   timeout.tv_sec = millis / 1000;
@@ -31,4 +31,4 @@ auto Wake(uint32_t* addr, size_t count) -> int {
   return futex(addr, FUTEX_WAKE_PRIVATE, (int)count, nullptr, nullptr, 0);
 }
 
-}  // namespace accord::syscall::detail
+}  // namespace concord::syscall::detail

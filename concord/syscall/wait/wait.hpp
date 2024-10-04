@@ -2,7 +2,7 @@
 
 #include <atomic>
 #include <cstdint>
-namespace accord::syscall {
+namespace concord::syscall {
 
 auto Wait(std::atomic<uint32_t>* atomic,  //
           uint32_t old,                   //
@@ -16,4 +16,4 @@ auto WaitTimed(std::atomic<uint32_t>* atomic,      //
 auto WakeOne(std::atomic<uint32_t>* atomic) -> void;
 auto WakeAll(std::atomic<uint32_t>* atomic) -> void;
 
-}  // namespace accord::syscall
+}  // namespace concord::syscall
