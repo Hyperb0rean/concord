@@ -6,43 +6,44 @@
 namespace axis {
 
 // Affine type
-template <typename T>
+template<typename T>
 class InitializationCell final {
- public:
-  template <typename... Args>
-  auto Emplace(Args&&... args) -> void {
-    std::construct_at<T>(Pointer(), std::forward<Args>(args)...);
-  }
+  public:
+    template<typename... Args>
+    auto emplace(Args&&... args) -> void {
+        std::construct_at<T>(pointer(), std::forward<Args>(args)...);
+    }
 
- public:
-  auto Get() && noexcept -> T {
-    auto&& val = std::move(*Pointer());
-    std::destroy_at(Pointer());
-    return val;
-  }
+  public:
+    auto get() && noexcept -> T {
+        auto&& val = std::move(*pointer());
+        std::destroy_at(pointer());
+        return val;
+    }
 
- public:
-  ~InitializationCell() = default;
-  InitializationCell() = default;
+  public:
+    ~InitializationCell() = default;
+    InitializationCell() = default;
 
-  // Non copyable
-  InitializationCell(const InitializationCell&) = delete;
-  auto operator=(const InitializationCell&) -> InitializationCell& = delete;
+    // Non copyable
+    InitializationCell(const InitializationCell&) = delete;
+    auto operator=(const InitializationCell&) -> InitializationCell& = delete;
 
-  // Moveable
-  InitializationCell(InitializationCell&& other) {
-    Emplace(std::move(*other.Pointer()));
-  };
-  auto operator=(InitializationCell&& other) -> InitializationCell& {
-    std::destroy_at(Pointer());
-    Emplace(std::move(*other.Pointer()));
-  };
+    // Moveable
+    InitializationCell(InitializationCell&& other) {
+        emplace(std::move(*other.pointer()));
+    };
 
- private:
-  auto Pointer() noexcept -> T* {
-    return std::launder(reinterpret_cast<T*>(std::addressof(storage_)));
-  }
+    auto operator=(InitializationCell&& other) -> InitializationCell& {
+        std::destroy_at(pointer());
+        Emplace(std::move(*other.pointer()));
+    };
 
-  alignas(T) std::byte storage_[sizeof(T)]{};
+  private:
+    auto pointer() noexcept -> T* {
+        return reinterpret_cast<T*>(std::addressof(_storage));
+    }
+
+    alignas(T) std::byte _storage[sizeof(T)] {};
 };
-}  // namespace axis
+} // namespace axis

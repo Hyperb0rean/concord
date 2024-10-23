@@ -4,17 +4,17 @@
 
 namespace axis::monad {
 
-inline auto Err(Error error) {
-  return std::unexpected(error);
+inline auto Err(Error error) { // NOLINT
+    return std::unexpected(error);
 }
 
-template <typename T>
-auto Ok(T value) -> Result<T> {
-  return {std::move(value)};
+template<typename T>
+auto Ok(T value) -> Result<T> { // NOLINT
+    return {std::move(value)};
 }
 
-auto Ok() -> Status {
-  return unit;
+auto Ok() -> Status { // NOLINT
+    return unit;
 }
 
-}  // namespace axis::monad
+} // namespace axis::monad

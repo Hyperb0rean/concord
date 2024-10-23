@@ -1,38 +1,38 @@
 #pragma once
 #include <functional>
+
 #include "preprocessor.hpp"
 
 namespace axis {
 namespace detail {
-template <typename F>
-class Defer {
- public:
-  // NB: no explicit see
-  // https://github.com/facebook/folly/blob/main/folly/ScopeGuard.h
-  // NOLINTNEXTLINE
-  Defer(F&& f)
-      : func_(std::forward<F>(f)) {
-  }
 
-  // Non copyable
-  Defer(const Defer&) = delete;
-  auto operator=(const Defer&) -> Defer& = delete;
+    template<typename F>
+    class Defer {
+      public:
+        // NB: no explicit see
+        // https://github.com/facebook/folly/blob/main/folly/ScopeGuard.h
+        // NOLINTNEXTLINE
+        Defer(F&& f) : _func(std::forward<F>(f)) {}
 
-  // Non moveable
-  Defer(Defer&&) noexcept = delete;
-  auto operator=(Defer&&) noexcept -> Defer& = delete;
+        // Non copyable
+        Defer(const Defer&) = delete;
+        auto operator=(const Defer&) -> Defer& = delete;
 
-  ~Defer() {
-    func_();
-  }
+        // Non moveable
+        Defer(Defer&&) noexcept = delete;
+        auto operator=(Defer&&) noexcept -> Defer& = delete;
 
- private:
-  F func_;
-};
-}  // namespace detail
+        ~Defer() {
+            _func();
+        }
 
-}  // namespace axis
+      private:
+        F _func;
+    };
+} // namespace detail
 
-#define AXIS_DEFER                                       \
-  [[maybe_unused]] ::axis::detail::Defer AXIS_ANONYMOUS( \
-      axis_defer) = [&]() noexcept
+} // namespace axis
+
+#define AXIS_DEFER \
+    [[maybe_unused]] ::axis::detail::Defer AXIS_ANONYMOUS(axis_defer \
+    ) = [&]() noexcept

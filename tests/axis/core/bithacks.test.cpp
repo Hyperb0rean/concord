@@ -1,74 +1,75 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include <axis/core/bithacks.hpp>
 
-TEST(Bithacks, GetBit) {
-  EXPECT_EQ(GetBit(0x0FFFFFFF, 0), 1);
-  EXPECT_EQ(GetBit(0x0FFFFFFF, 63), 0);
-  EXPECT_EQ(GetBit(0x0FFFFFFF, 14), 1);
-  EXPECT_EQ(GetBit(0x0FFFFFFF, 32), 0);
+TEST(Bithacks, get_bit) {
+    EXPECT_EQ(get_bit(0x0FFFFFFF, 0), 1);
+    EXPECT_EQ(get_bit(0x0FFFFFFF, 63), 0);
+    EXPECT_EQ(get_bit(0x0FFFFFFF, 14), 1);
+    EXPECT_EQ(get_bit(0x0FFFFFFF, 32), 0);
 }
 
-TEST(Bithacks, IsPowerOfTwo) {
-  EXPECT_TRUE(IsPowerOfTwo(2));
-  EXPECT_TRUE(IsPowerOfTwo(1024));
-  EXPECT_FALSE(IsPowerOfTwo(3));
-  EXPECT_FALSE(IsPowerOfTwo(15));
+TEST(Bithacks, is_power_of_two) {
+    EXPECT_TRUE(is_power_of_two(2));
+    EXPECT_TRUE(is_power_of_two(1024));
+    EXPECT_FALSE(is_power_of_two(3));
+    EXPECT_FALSE(is_power_of_two(15));
 
-  // NB
-  EXPECT_TRUE(IsPowerOfTwo(0));
+    // NB
+    EXPECT_TRUE(is_power_of_two(0));
 }
 
 TEST(Bithacks, NextPowerOfTwo) {
-  EXPECT_EQ(RoundPowerOfTwo(2), 2);
-  EXPECT_EQ(RoundPowerOfTwo(1024), 1024);
-  EXPECT_EQ(RoundPowerOfTwo(3), 4);
-  EXPECT_EQ(RoundPowerOfTwo(1337), 2048);
+    EXPECT_EQ(round_power_of_two(2), 2);
+    EXPECT_EQ(round_power_of_two(1024), 1024);
+    EXPECT_EQ(round_power_of_two(3), 4);
+    EXPECT_EQ(round_power_of_two(1337), 2048);
 
-  // NB
-  EXPECT_EQ(RoundPowerOfTwo(0), 0);
+    // NB
+    EXPECT_EQ(round_power_of_two(0), 0);
 }
 
-TEST(Bithacks, BinaryLog) {
-  EXPECT_EQ(BinaryLog(16), 4);
-  EXPECT_EQ(BinaryLog(1024), 10);
-  EXPECT_EQ(BinaryLog(1024 * 1024 + 1024), 20);
-  EXPECT_EQ(BinaryLog(1337), 10);
+TEST(Bithacks, binary_log) {
+    EXPECT_EQ(binary_log(16), 4);
+    EXPECT_EQ(binary_log(1024), 10);
+    EXPECT_EQ(binary_log(1024 * 1024 + 1024), 20);
+    EXPECT_EQ(binary_log(1337), 10);
 }
 
-TEST(Bithacks, GetByte) {
-  EXPECT_EQ(GetByte(0x1234567890ABCDEF, 0), 0xEF);
-  EXPECT_EQ(GetByte(0x1234567890ABCDEF, 1), 0xCD);
-  EXPECT_EQ(GetByte(0x1234567890ABCDEF, 2), 0xAB);
-  EXPECT_EQ(GetByte(0x1234567890ABCDEF, 3), 0x90);
+TEST(Bithacks, get_byte) {
+    EXPECT_EQ(get_byte(0x1234567890ABCDEF, 0), 0xEF);
+    EXPECT_EQ(get_byte(0x1234567890ABCDEF, 1), 0xCD);
+    EXPECT_EQ(get_byte(0x1234567890ABCDEF, 2), 0xAB);
+    EXPECT_EQ(get_byte(0x1234567890ABCDEF, 3), 0x90);
 }
 
-TEST(Bithacks, ReverseByte) {
-  EXPECT_EQ(ReverseByte(0x00), 0x00);
-  EXPECT_EQ(ReverseByte(0x01), 0x80);
-  EXPECT_EQ(ReverseByte(0x80), 0x01);
-  EXPECT_EQ(ReverseByte(0xFF), 0xFF);
+TEST(Bithacks, reverse_byte) {
+    EXPECT_EQ(reverse_byte(0x00), 0x00);
+    EXPECT_EQ(reverse_byte(0x01), 0x80);
+    EXPECT_EQ(reverse_byte(0x80), 0x01);
+    EXPECT_EQ(reverse_byte(0xFF), 0xFF);
 }
 
-TEST(ByteOperationsTest, ReverseBits) {
-  EXPECT_EQ(ReverseBits(0x1234567890ABCDEF), 0xF7B3D5091E6A2C48);
-  EXPECT_EQ(ReverseBits(0x0123456789ABCDEF), 0xF7B3D591E6A2C480);
-  EXPECT_EQ(ReverseBits(0x00000000FFFFFFFF), 0xFFFFFFFF00000000);
-  EXPECT_EQ(ReverseBits(0xFFFFFFFF00000000), 0x00000000FFFFFFFF);
+TEST(ByteOperationsTest, reverse_bits) {
+    EXPECT_EQ(reverse_bits(0x1234567890ABCDEF), 0xF7B3D5091E6A2C48);
+    EXPECT_EQ(reverse_bits(0x0123456789ABCDEF), 0xF7B3D591E6A2C480);
+    EXPECT_EQ(reverse_bits(0x00000000FFFFFFFF), 0xFFFFFFFF00000000);
+    EXPECT_EQ(reverse_bits(0xFFFFFFFF00000000), 0x00000000FFFFFFFF);
 }
 
-TEST(ByteOperationsTest, NextLexPermutation) {
-  EXPECT_EQ(NextLexPermutation(0x0), 0x7FFFFFFF);
+TEST(ByteOperationsTest, next_lex_permutation) {
+    EXPECT_EQ(next_lex_permutation(0x0), 0x7FFFFFFF);
 }
 
-TEST(Bithacks, GetLowHalf) {
-  EXPECT_EQ(GetLowHalf(0x1234567890ABCDEF), 0x90ABCDEF);
-  EXPECT_EQ(GetLowHalf(0x0000000012345678), 0x12345678);
-  EXPECT_EQ(GetLowHalf(0xFFFFFFFF00000000), 0x00000000);
+TEST(Bithacks, get_low_half) {
+    EXPECT_EQ(get_low_half(0x1234567890ABCDEF), 0x90ABCDEF);
+    EXPECT_EQ(get_low_half(0x0000000012345678), 0x12345678);
+    EXPECT_EQ(get_low_half(0xFFFFFFFF00000000), 0x00000000);
 }
 
-TEST(Bithacks, GetHighHalf) {
-  EXPECT_EQ(GetHighHalf(0x1234567890ABCDEF), 0x12345678);
-  EXPECT_EQ(GetHighHalf(0x0000000012345678), 0x0000000);
-  EXPECT_EQ(GetHighHalf(0xFFFFFFFF00000000), 0xFFFFFFFF);
+TEST(Bithacks, get_high_half) {
+    EXPECT_EQ(get_high_half(0x1234567890ABCDEF), 0x12345678);
+    EXPECT_EQ(get_high_half(0x0000000012345678), 0x0000000);
+    EXPECT_EQ(get_high_half(0xFFFFFFFF00000000), 0xFFFFFFFF);
 }

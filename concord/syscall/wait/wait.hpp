@@ -2,18 +2,23 @@
 
 #include <atomic>
 #include <cstdint>
+
 namespace concord::syscall {
 
-auto Wait(std::atomic<uint32_t>* atomic,  //
-          uint32_t old,                   //
-          std::memory_order mo = std::memory_order::seq_cst) -> void;
+auto wait(
+    std::atomic<uint32_t>* atomic, //
+    uint32_t old, //
+    std::memory_order mo = std::memory_order::seq_cst
+) -> void;
 
-auto WaitTimed(std::atomic<uint32_t>* atomic,      //
-               uint32_t old,                       //
-               std::chrono::milliseconds timeout,  //
-               std::memory_order mo = std::memory_order::seq_cst) -> bool;
+auto wait_timed(
+    std::atomic<uint32_t>* atomic, //
+    uint32_t old, //
+    std::chrono::milliseconds timeout, //
+    std::memory_order mo = std::memory_order::seq_cst
+) -> bool;
 
-auto WakeOne(std::atomic<uint32_t>* atomic) -> void;
-auto WakeAll(std::atomic<uint32_t>* atomic) -> void;
+auto wake_one(std::atomic<uint32_t>* atomic) -> void;
+auto wake_all(std::atomic<uint32_t>* atomic) -> void;
 
-}  // namespace concord::syscall
+} // namespace concord::syscall

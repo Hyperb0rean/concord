@@ -7,228 +7,212 @@ namespace axis {
 
 struct IntrusiveListDefaultTag {};
 
-template <typename T, typename Tag = IntrusiveListDefaultTag>
+template<typename T, typename Tag = IntrusiveListDefaultTag>
 struct IntrusiveListNode {
-  auto IsLinked [[nodiscard]] () const noexcept -> bool {
-    return next_ != nullptr;
-  }
-
-  auto Unlink() noexcept -> void {
-    if (next_) {
-      next_->prev_ = prev_;
+    auto is_linked [[nodiscard]] () const noexcept -> bool {
+        return _next != nullptr;
     }
-    if (prev_) {
-      prev_->next_ = next_;
+
+    auto unlink() noexcept -> void {
+        if (_next) {
+            _next->_prev = _prev;
+        }
+        if (_prev) {
+            _prev->_next = _next;
+        }
+        _next = _prev = nullptr;
     }
-    next_ = prev_ = nullptr;
-  }
 
-  auto LinkBefore(IntrusiveListNode* next) noexcept -> void {
-    prev_ = next->prev_;
-    prev_->next_ = this;
-    next_ = next;
-    next->prev_ = this;
-  }
+    auto link_before(IntrusiveListNode* next) noexcept -> void {
+        _prev = next->_prev;
+        _prev->_next = this;
+        _next = next;
+        next->_prev = this;
+    }
 
-  auto Item [[nodiscard]] () noexcept -> T* {
-    return static_cast<T*>(this);
-  }
+    auto item [[nodiscard]] () noexcept -> T* {
+        return static_cast<T*>(this);
+    }
 
-  IntrusiveListNode() = default;
+    IntrusiveListNode() = default;
 
-  // Non copyable
-  IntrusiveListNode(const IntrusiveListNode&) = delete;
-  auto operator=(const IntrusiveListNode&) -> IntrusiveListNode& = delete;
+    // Non copyable
+    IntrusiveListNode(const IntrusiveListNode&) = delete;
+    auto operator=(const IntrusiveListNode&) -> IntrusiveListNode& = delete;
 
-  IntrusiveListNode(IntrusiveListNode&&) noexcept = default;
-  auto operator=(IntrusiveListNode&&) noexcept -> IntrusiveListNode& = default;
+    IntrusiveListNode(IntrusiveListNode&&) noexcept = default;
+    auto operator=(IntrusiveListNode&&) noexcept
+        -> IntrusiveListNode& = default;
 
-  virtual ~IntrusiveListNode() {
-    Unlink();
-  }
+    virtual ~IntrusiveListNode() {
+        unlink();
+    }
 
-  IntrusiveListNode* next_ = nullptr;
-  IntrusiveListNode* prev_ = nullptr;
+    IntrusiveListNode* _next = nullptr;
+    IntrusiveListNode* _prev = nullptr;
 };
 
-template <class T, typename Tag = IntrusiveListDefaultTag>
-class IntrusiveList final : private IntrusiveListNode<T, Tag> {
-  template <class Node, class Item>
-  class IteratorImpl {
-   public:
-    using iterator_category = std::bidirectional_iterator_tag;  // NOLINT
-    using value_type = Item;                                    // NOLINT
-    using difference_type = ptrdiff_t;                          // NOLINT
-    using pointer = value_type*;                                // NOLINT
-    using reference = value_type&;                              // NOLINT
+template<class T, typename Tag = IntrusiveListDefaultTag>
+class IntrusiveList final: private IntrusiveListNode<T, Tag> {
+    template<class Node, class Item>
+    class IteratorImpl {
+      public:
+        using iterator_category = std::bidirectional_iterator_tag; // NOLINT
+        using value_type = Item; // NOLINT
+        using difference_type = ptrdiff_t; // NOLINT
+        using pointer = value_type*; // NOLINT
+        using reference = value_type&; // NOLINT
 
-    IteratorImpl() = default;
-    IteratorImpl(const IteratorImpl& it) = default;
-    IteratorImpl(IteratorImpl&& it) = default;
-    auto operator=(const IteratorImpl& it) -> IteratorImpl& = default;
-    auto operator=(IteratorImpl&& it) -> IteratorImpl& = default;
-    ~IteratorImpl() = default;
+        IteratorImpl() = default;
+        IteratorImpl(const IteratorImpl& it) = default;
+        IteratorImpl(IteratorImpl&& it) = default;
+        auto operator=(const IteratorImpl& it) -> IteratorImpl& = default;
+        auto operator=(IteratorImpl&& it) -> IteratorImpl& = default;
+        ~IteratorImpl() = default;
 
-    explicit IteratorImpl(Node* val) noexcept
-        : current_(val) {
+        explicit IteratorImpl(Node* val) noexcept : _current(val) {}
+
+        auto operator++() -> IteratorImpl& {
+            _current = _current->_next;
+            return *this;
+        }
+
+        auto operator++(int) -> IteratorImpl {
+            auto temp = *this;
+            _current = _current->_next;
+            return temp;
+        }
+
+        auto operator--() -> IteratorImpl& {
+            _current = _current->_prev;
+            return *this;
+        }
+
+        auto operator--(int) -> IteratorImpl {
+            auto temp = *this;
+            _current = _current->_prev;
+            return temp;
+        }
+
+        auto operator*() const -> reference {
+            return *static_cast<pointer>(_current);
+        }
+
+        auto operator->() const -> pointer {
+            return static_cast<pointer>(_current);
+        }
+
+        auto operator==(const IteratorImpl& other) const noexcept -> bool {
+            return _current == other._current;
+        }
+
+        auto operator!=(const IteratorImpl& other) const noexcept -> bool {
+            return _current != other._current;
+        }
+
+      private:
+        Node* _current;
+    };
+
+  public:
+    using Iterator = IteratorImpl<IntrusiveListNode<T, Tag>, T>;
+    using ConstIterator =
+        IteratorImpl<const IntrusiveListNode<T, Tag>, const T>;
+
+    auto begin [[nodiscard]] () -> Iterator {
+        return Iterator {this->_next};
     }
 
-    auto operator++() -> IteratorImpl& {
-      current_ = current_->next_;
-      return *this;
-    }
-    auto operator++(int) -> IteratorImpl {
-      auto temp = *this;
-      current_ = current_->next_;
-      return temp;
-    }
-    auto operator--() -> IteratorImpl& {
-      current_ = current_->prev_;
-      return *this;
-    }
-    auto operator--(int) -> IteratorImpl {
-      auto temp = *this;
-      current_ = current_->prev_;
-      return temp;
+    auto end [[nodiscard]] () -> Iterator {
+        return Iterator {static_cast<IntrusiveListNode<T, Tag>*>(this)};
     }
 
-    auto operator*() const -> reference {
-      return *static_cast<pointer>(current_);
+    auto cbegin [[nodiscard]] () const -> ConstIterator {
+        return ConstIterator {
+            static_cast<const IntrusiveListNode<T, Tag>*>(this->_next)};
     }
 
-    auto operator->() const -> pointer {
-      return static_cast<pointer>(current_);
+    auto cend [[nodiscard]] () const -> ConstIterator {
+        return ConstIterator {
+            static_cast<const IntrusiveListNode<T, Tag>*>(this)};
     }
 
-    auto operator==(const IteratorImpl& other) const noexcept -> bool {
-      return current_ == other.current_;
+  public:
+    IntrusiveList() {
+        this->_next = this->_prev = this;
+    };
+
+    // must unlink all elements from list
+    ~IntrusiveList() {
+        while (pop_back()) {}
     }
-    auto operator!=(const IteratorImpl& other) const noexcept -> bool {
-      return current_ != other.current_;
+
+    IntrusiveList(const IntrusiveList&) = delete;
+    auto operator=(const IntrusiveList&) -> IntrusiveList& = delete;
+
+    IntrusiveList(IntrusiveList&& other) noexcept {
+        this->_next = this->_prev = this;
+        append(other);
+    };
+
+    auto operator=(IntrusiveList&& other) noexcept -> IntrusiveList& {
+        while (pop_back()) {}
+        append(other);
+        return *this;
     }
 
-   private:
-    Node* current_;
-  };
-
- public:
-  using Iterator = IteratorImpl<IntrusiveListNode<T, Tag>, T>;
-  using ConstIterator = IteratorImpl<const IntrusiveListNode<T, Tag>, const T>;
-
-  auto Begin [[nodiscard]] () -> Iterator {
-    return Iterator{this->next_};
-  }
-  auto End [[nodiscard]] () -> Iterator {
-    return Iterator{static_cast<IntrusiveListNode<T, Tag>*>(this)};
-  }
-
-  auto Begin [[nodiscard]] () const -> ConstIterator {
-    return ConstIterator{
-        static_cast<const IntrusiveListNode<T, Tag>*>(this->next_)};
-  }
-  auto End [[nodiscard]] () const -> ConstIterator {
-    return ConstIterator{static_cast<const IntrusiveListNode<T, Tag>*>(this)};
-  }
-
- public:
-  IntrusiveList() {
-    this->next_ = this->prev_ = this;
-  };
-
-  // must unlink all elements from list
-  ~IntrusiveList() {
-    while (PopBack()) {
+  public:
+    auto is_empty [[nodiscard]] () const noexcept -> bool {
+        return this->_next == this;
     }
-  }
 
-  IntrusiveList(const IntrusiveList&) = delete;
-  auto operator=(const IntrusiveList&) -> IntrusiveList& = delete;
-
-  IntrusiveList(IntrusiveList&& other) noexcept {
-    this->next_ = this->prev_ = this;
-    Append(other);
-  };
-  auto operator=(IntrusiveList&& other) noexcept -> IntrusiveList& {
-    while (PopBack()) {
+    // this method is allowed to be O(n)
+    auto size() const -> std::size_t {
+        return std::distance(cbegin(), cend());
     }
-    Append(other);
-    return *this;
-  }
 
- public:
-  auto IsEmpty [[nodiscard]] () const noexcept -> bool {
-    return this->next_ == this;
-  }
-
-  // this method is allowed to be O(n)
-  auto Size() const -> std::size_t {
-    return std::distance(Begin(), End());
-  }
-
- public:
-  // note that IntrusiveList doesn't own elements,
-  // and never copies or moves T
-  auto PushBack(T* elem) -> void {
-    elem->LinkBefore(this);
-  }
-  auto PushFront(T* elem) -> void {
-    elem->LinkBefore(this->next_);
-  }
-
-  auto PopBack() -> T* {
-    if (IsEmpty()) {
-      return nullptr;
+  public:
+    // note that IntrusiveList doesn't own elements,
+    // and never copies or moves T
+    auto push_back(T* elem) -> void {
+        elem->link_before(this);
     }
-    auto* back = this->prev_;
-    back->Unlink();
-    return back->Item();
-  }
-  auto PopFront() -> T* {
-    if (IsEmpty()) {
-      return nullptr;
+
+    auto push_front(T* elem) -> void {
+        elem->link_before(this->_next);
     }
-    auto* front = this->next_;
-    front->Unlink();
-    return front->Item();
-  }
 
-  auto Append(IntrusiveList& other) noexcept -> void {
-    auto* other_front = other.next_;
-    auto* other_back = other.prev_;
+    auto pop_back() -> T* {
+        if (is_empty()) {
+            return nullptr;
+        }
+        auto* back = this->_prev;
+        back->unlink();
+        return back->item();
+    }
 
-    other_back->next_ = this;
-    other_front->prev_ = this->prev_;
+    auto pop_front() -> T* {
+        if (is_empty()) {
+            return nullptr;
+        }
+        auto* front = this->_next;
+        front->unlink();
+        return front->item();
+    }
 
-    auto* back = this->prev_;
+    auto append(IntrusiveList& other) noexcept -> void {
+        auto* other_front = other._next;
+        auto* other_back = other._prev;
 
-    this->prev_ = other_back;
-    back->next_ = other_front;
+        other_back->_next = this;
+        other_front->_prev = this->_prev;
 
-    other.prev_ = other.next_ = &other;
-  }
+        auto* back = this->_prev;
+
+        this->_prev = other_back;
+        back->_next = other_front;
+
+        other._prev = other._next = &other;
+    }
 };
-}  // namespace axis
-
-template <typename T, typename Tag>
-auto begin(axis::IntrusiveList<T, Tag>& list)  // NOLINT
-    -> axis::IntrusiveList<T, Tag>::Iterator {
-  return list.Begin();
-}
-
-template <typename T, typename Tag>
-auto end(axis::IntrusiveList<T, Tag>& list)  // NOLINT
-    -> axis::IntrusiveList<T, Tag>::Iterator {
-  return list.End();
-}
-
-template <typename T, typename Tag>
-auto begin(const axis::IntrusiveList<T, Tag>& list)  // NOLINT
-    -> axis::IntrusiveList<T, Tag>::ConstIterator {
-  return list.Begin();
-}
-
-template <typename T, typename Tag>
-auto end(const axis::IntrusiveList<T, Tag>& list)  // NOLINT
-    -> axis::IntrusiveList<T, Tag>::ConstIterator {
-  return list.End();
-}
+} // namespace axis

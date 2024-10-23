@@ -2,7 +2,7 @@
 
 #include "type.hpp"
 
-template <typename T, typename C>
+template<typename T, typename C>
 auto operator|(::axis::monad::Result<T> r, C c) {
-  return c.Pipe(std::move(r));
+    return c.pipe(std::move(r));
 }

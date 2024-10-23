@@ -3,6 +3,6 @@
 #include "optional"
 
 namespace axis::monad {
-template <typename T>
+template<typename T>
 using Maybe = std::optional<T>;
 }

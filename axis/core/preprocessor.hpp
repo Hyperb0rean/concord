@@ -8,7 +8,7 @@
 
 // Should also think about modular build, where counter is no longer unique
 #ifdef __COUNTER__
-#define AXIS_ANONYMOUS(name) AXIS_CONCAT(name, __COUNTER__)
+    #define AXIS_ANONYMOUS(name) AXIS_CONCAT(name, __COUNTER__)
 #else
-#define AXIS_ANONYMOUS(name) AXIS_CONCAT(name, __LINE__)
+    #define AXIS_ANONYMOUS(name) AXIS_CONCAT(name, __LINE__)
 #endif

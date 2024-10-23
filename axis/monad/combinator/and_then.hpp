@@ -1,45 +1,44 @@
 #pragma once
 
 #include <axis/monad/result/type.hpp>
-#include <axis/monad/trait/value_of.hpp>
-#include <axis/monad/trait/is_result.hpp>
 #include <axis/monad/trait/is_maybe.hpp>
-
-#include <type_traits>  // std::invoke_result_t
+#include <axis/monad/trait/is_result.hpp>
+#include <axis/monad/trait/value_of.hpp>
+#include <type_traits> // std::invoke_result_t
 
 namespace axis::monad {
 
 namespace combinator {
 
-template <typename F>
-struct [[nodiscard]] AndThen {
-  F user;
+    template<typename F>
+    struct [[nodiscard]] AndThen {
+        F user;
 
-  explicit AndThen(F u)
-      : user(std::move(u)) {
-  }
+        explicit AndThen(F u) : user(std::move(u)) {}
 
-  // Non-copyable
-  AndThen(const AndThen&) = delete;
-  auto operator=(const AndThen&) -> AndThen& = delete;
+        // Non-copyable
+        AndThen(const AndThen&) = delete;
+        auto operator=(const AndThen&) -> AndThen& = delete;
 
-  template <typename T>
-  using U = ValueOf<std::invoke_result_t<F, T>>;
+        template<typename T>
+        using U = ValueOf<std::invoke_result_t<F, T>>;
 
-  template <typename Monad>
-  requires IsResult<Monad>
-  auto Pipe(Monad r) -> Result<U<ValueOf<Monad>>> {
-    return std::move(r).and_then(user);
-  }
+        template<typename Monad>
+        requires IsResult<Monad>
 
-  template <typename Monad>
-  requires IsMaybe<Monad>
-  auto Pipe(Monad r) -> Maybe<U<ValueOf<Monad>>> {
-    return std::move(r).and_then(user);
-  }
-};
+        auto pipe(Monad r) -> Result<U<ValueOf<Monad>>> {
+            return std::move(r).and_then(user);
+        }
 
-}  // namespace combinator
+        template<typename Monad>
+        requires IsMaybe<Monad>
+
+        auto pipe(Monad r) -> Maybe<U<ValueOf<Monad>>> {
+            return std::move(r).and_then(user);
+        }
+    };
+
+} // namespace combinator
 
 /*
  * Monad<T> -> (T -> Monad<U>) -> Monad<U>
@@ -52,9 +51,9 @@ struct [[nodiscard]] AndThen {
  *
  */
 
-template <typename F>
-auto AndThen(F user) {
-  return combinator::AndThen{std::move(user)};
+template<typename F>
+auto and_then(F user) {
+    return combinator::AndThen {std::move(user)};
 }
 
-}  // namespace axis::monad
+} // namespace axis::monad
