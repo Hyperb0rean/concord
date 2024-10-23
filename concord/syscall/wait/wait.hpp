@@ -16,7 +16,7 @@ auto wait_timed(
     uint32_t old, //
     std::chrono::milliseconds timeout, //
     std::memory_order mo = std::memory_order::seq_cst
-) -> bool;
+) -> void;
 
 auto wake_one(std::atomic<uint32_t>* atomic) -> void;
 auto wake_all(std::atomic<uint32_t>* atomic) -> void;

@@ -1,5 +1,9 @@
 
+
+#include "wait.hpp"
+
 #include "platform/wait.hpp"
+
 #ifdef LINUX
     #include "platform/linux.hpp"
 #elif APPLE
@@ -8,17 +12,18 @@
     #include "platform/windows.hpp"
 #endif
 
-#include "wait.hpp"
-
 namespace concord::syscall {
-auto wait(std::atomic<uint32_t>* atomic, uint32_t old) -> void {
+
+auto wait(std::atomic<uint32_t>* atomic, uint32_t old, std::memory_order mo)
+    -> void {
     detail::wait(&*reinterpret_cast<uint32_t*>(atomic), old);
 }
 
 auto wait_timed(
     std::atomic<uint32_t>* atomic,
     uint32_t old,
-    std::chrono::milliseconds timeout
+    std::chrono::milliseconds timeout,
+    std::memory_order mo
 ) -> void {
     detail::wait_timed(
         &*reinterpret_cast<uint32_t*>(atomic),
