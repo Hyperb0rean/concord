@@ -4,6 +4,7 @@
 
 // https://graphics.stanford.edu/~seander/bithacks.html
 
+namespace axis {
 constexpr auto get_bit(uint64_t x, uint64_t index) -> uint64_t {
     return (x >> index) & 1;
 }
@@ -98,3 +99,5 @@ constexpr auto get_low_half(uint64_t x) -> uint64_t {
 constexpr auto get_high_half(uint64_t x) -> uint64_t {
     return (x >> 32) & 0xFFFFFFFF;
 }
+
+} // namespace axis

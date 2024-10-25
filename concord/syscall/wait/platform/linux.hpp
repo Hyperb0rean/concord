@@ -22,7 +22,7 @@ int futex(
 } // namespace
 
 namespace concord::syscall::detail {
-auto wait_timed(uint32_t* addr, uint32_t old, uint32_t millis) -> int {
+inline auto wait_timed(uint32_t* addr, uint32_t old, uint32_t millis) -> int {
     struct timespec timeout;
     timeout.tv_sec = millis / 1000;
     timeout.tv_nsec = (millis % 1000) * 1000'000;
@@ -30,11 +30,11 @@ auto wait_timed(uint32_t* addr, uint32_t old, uint32_t millis) -> int {
     return futex(addr, FUTEX_WAIT_PRIVATE, old, &timeout, nullptr, 0);
 }
 
-auto wait(uint32_t* addr, uint32_t old) -> int {
+inline auto wait(uint32_t* addr, uint32_t old) -> int {
     return futex(addr, FUTEX_WAIT_PRIVATE, old, nullptr, nullptr, 0);
 }
 
-auto wake(uint32_t* addr, size_t count) -> int {
+inline auto wake(uint32_t* addr, size_t count) -> int {
     return futex(addr, FUTEX_WAKE_PRIVATE, (int)count, nullptr, nullptr, 0);
 }
 

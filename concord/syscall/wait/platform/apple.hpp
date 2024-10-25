@@ -18,15 +18,16 @@ __ulock_wake(uint32_t operation, void* addr, uint64_t wake_value); // NOLINT
 
 namespace concord::syscall::detail {
 
-auto wait_timed(uint32_t* addr, uint32_t expected, uint32_t millis) -> int {
+inline auto wait_timed(uint32_t* addr, uint32_t expected, uint32_t millis)
+    -> int {
     return __ulock_wait(UL_COMPARE_AND_WAIT, addr, expected, millis * 1000);
 }
 
-auto wait(uint32_t* addr, uint32_t old) -> int {
+inline auto wait(uint32_t* addr, uint32_t old) -> int {
     return wait_timed(addr, old, /*millis=*/0);
 }
 
-auto wake(uint32_t* addr, size_t count) -> int {
+inline auto wake(uint32_t* addr, size_t count) -> int {
     return __ulock_wake(
         UL_COMPARE_AND_WAIT | ((count == 1) ? 0 : ULF_WAKE_ALL),
         addr,

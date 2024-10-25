@@ -3,6 +3,8 @@
 
 #include <axis/core/bithacks.hpp>
 
+using namespace axis; // NOLINT
+
 TEST(Bithacks, get_bit) {
     EXPECT_EQ(get_bit(0x0FFFFFFF, 0), 1);
     EXPECT_EQ(get_bit(0x0FFFFFFF, 63), 0);
