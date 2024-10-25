@@ -17,7 +17,7 @@ int futex(
     int* uaddr2,
     int val3
 ) {
-    return syscall(SYS_futex, uaddr, op, val, timeout, uaddr2, val3);
+    return ::syscall(SYS_futex, uaddr, op, val, timeout, uaddr2, val3);
 }
 } // namespace
 
