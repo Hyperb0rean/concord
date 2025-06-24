@@ -10,12 +10,14 @@ template<typename T>
 class InitializationCell final {
   public:
     template<typename... Args>
-    auto emplace(Args&&... args) -> void {
+    auto
+    emplace(Args&&... args) noexcept(std::is_nothrow_constructible_v<T, Args...>
+    ) -> void {
         std::construct_at<T>(pointer(), std::forward<Args>(args)...);
     }
 
   public:
-    auto get() && noexcept -> T {
+    auto get() && noexcept(std::is_nothrow_move_constructible_v<T>) -> T {
         auto&& val = std::move(*pointer());
         std::destroy_at(pointer());
         return val;
@@ -30,13 +32,16 @@ class InitializationCell final {
     auto operator=(const InitializationCell&) -> InitializationCell& = delete;
 
     // Moveable
-    InitializationCell(InitializationCell&& other) {
+    InitializationCell(
+        InitializationCell&& other
+    ) noexcept(std::is_nothrow_move_constructible_v<T>) {
         emplace(std::move(*other.pointer()));
     };
 
-    auto operator=(InitializationCell&& other) -> InitializationCell& {
+    auto operator=(InitializationCell&& other
+    ) noexcept(std::is_nothrow_move_constructible_v<T>) -> InitializationCell& {
         std::destroy_at(pointer());
-        Emplace(std::move(*other.pointer()));
+        emplace(std::move(*other.pointer()));
     };
 
   private:

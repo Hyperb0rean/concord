@@ -16,18 +16,18 @@ namespace concord::syscall::detail {
 // TODO: make flags work
 
 auto mmap(char* addr, std::size_t length, int prot, int flags) -> char* {
-    return reinterpret_cast<char*>(
-        VirtualAlloc(reinterpret_cast<void*>(addr), length, prot, flags)
+    return static_cast<char*>(
+        VirtualAlloc(static_cast<void*>(addr), length, prot, flags)
     );
 }
 
 auto munmap(char* addr, std::size_t length) -> int {
-    return static_cast<int>(VirtualFree(reinterpret_cast<void*>(addr), length));
+    return static_cast<int>(VirtualFree(static_cast<void*>(addr), length));
 }
 
 auto mprotect(char* addr, std::size_t len, int prot) -> int {
     return static_cast<int>(
-        VirtualProtect(reinterpret_cast<void*>(addr), len, prot, nullptr)
+        VirtualProtect(static_cast<void*>(addr), len, prot, nullptr)
     );
 }
 } // namespace concord::syscall::detail

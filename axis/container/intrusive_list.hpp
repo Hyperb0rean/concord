@@ -63,13 +63,6 @@ class IntrusiveList final: private IntrusiveListNode<T, Tag> {
         using pointer = value_type*; // NOLINT
         using reference = value_type&; // NOLINT
 
-        IteratorImpl() = default;
-        IteratorImpl(const IteratorImpl& it) = default;
-        IteratorImpl(IteratorImpl&& it) = default;
-        auto operator=(const IteratorImpl& it) -> IteratorImpl& = default;
-        auto operator=(IteratorImpl&& it) -> IteratorImpl& = default;
-        ~IteratorImpl() = default;
-
         explicit IteratorImpl(Node* val) noexcept : _current(val) {}
 
         auto operator++() -> IteratorImpl& {
@@ -127,14 +120,15 @@ class IntrusiveList final: private IntrusiveListNode<T, Tag> {
         return Iterator {static_cast<IntrusiveListNode<T, Tag>*>(this)};
     }
 
-    auto cbegin [[nodiscard]] () const -> ConstIterator {
+    auto begin [[nodiscard]] () const -> ConstIterator {
         return ConstIterator {
-            static_cast<const IntrusiveListNode<T, Tag>*>(this->_next)};
+            static_cast<const IntrusiveListNode<T, Tag>*>(this->_next)
+        };
     }
 
-    auto cend [[nodiscard]] () const -> ConstIterator {
-        return ConstIterator {
-            static_cast<const IntrusiveListNode<T, Tag>*>(this)};
+    auto end [[nodiscard]] () const -> ConstIterator {
+        return ConstIterator {static_cast<const IntrusiveListNode<T, Tag>*>(this
+        )};
     }
 
   public:
@@ -168,21 +162,21 @@ class IntrusiveList final: private IntrusiveListNode<T, Tag> {
 
     // this method is allowed to be O(n)
     auto size() const -> std::size_t {
-        return std::distance(cbegin(), cend());
+        return std::distance(begin(), end());
     }
 
   public:
     // note that IntrusiveList doesn't own elements,
     // and never copies or moves T
-    auto push_back(T* elem) -> void {
+    auto push_back(T* elem) noexcept -> void {
         elem->link_before(this);
     }
 
-    auto push_front(T* elem) -> void {
+    auto push_front(T* elem) noexcept -> void {
         elem->link_before(this->_next);
     }
 
-    auto pop_back() -> T* {
+    auto pop_back() noexcept -> T* {
         if (is_empty()) {
             return nullptr;
         }
@@ -191,7 +185,7 @@ class IntrusiveList final: private IntrusiveListNode<T, Tag> {
         return back->item();
     }
 
-    auto pop_front() -> T* {
+    auto pop_front() noexcept -> T* {
         if (is_empty()) {
             return nullptr;
         }
