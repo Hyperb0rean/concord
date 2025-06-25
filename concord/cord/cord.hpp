@@ -12,7 +12,9 @@ class Cord:
     public axis::IntrusiveListNode<Cord> {
   public:
     template<std::invocable F>
-    Cord(F&& fn) : _coroutine(std::forward<F>(fn)) {} // NOLINT
+    Cord(F&& fn) : _coroutine(std::forward<F>(fn)) { // NOLINT
+        _coroutine.with_stack(_stack.view());
+    }
 
     // Non-movable
     Cord(Cord&& other) = delete;

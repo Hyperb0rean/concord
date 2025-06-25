@@ -24,8 +24,6 @@ class Coroutine: public IRunnable {
 
     auto run [[noreturn]] () noexcept -> void final;
 
-    ~Coroutine() = default;
-
   private:
     bool _is_completed {false};
 

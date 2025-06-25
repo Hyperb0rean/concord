@@ -34,71 +34,21 @@ auto wait_test() -> void {
     producer.join();
 }
 
-class ExampleCoroutine: public concord::cord::IRunnable {
-  public:
-    explicit ExampleCoroutine(int& counter) : _counter(counter) {}
-
-    auto run [[noreturn]] () noexcept -> void final {
-        while (true) {
-            std::cout << "Coroutine: " << _counter++ << "\n";
-            context.switch_to(*previous);
-        }
-    }
-
-    concord::cord::context::Context context;
-    concord::cord::context::Context* previous;
-
-  private:
-    int& _counter;
-};
-
-auto context_test() -> void {
-    auto stack = concord::cord::StackAllocator::allocate(1024 * 1024);
-
-    int counter = 0;
-    ExampleCoroutine coro(counter);
-
-    coro.context.make(stack.view(), &coro);
-
-    concord::cord::context::Context main_context;
-    coro.previous = &main_context;
-}
-
-auto context_test2() -> void {
-    auto stack = concord::cord::StackAllocator::allocate(1024 * 1024);
-
-    int counter = 0;
-
-    concord::cord::Coroutine coro = [&]() {
-        for (int i = 0; i < 3; ++i) {
-            std::cout << "Coroutine: " << counter++ << "\n";
-            coro.suspend();
-        }
-    };
-
-    coro.with_stack(stack.view());
-
-    for (int i = 0; i < 3; ++i) {
-        std::cout << "Main: " << counter << "\n";
-        coro.resume();
-    }
-}
-
 auto cord_test() -> void {
     using namespace concord::cord; // NOLINT
     concord::runtime::loop::Loop rt;
 
     int counter = 0;
 
-    concord::cord::Cord task = [&]() {
+    auto* task = new concord::cord::Cord {[&]() {
         for (int i = 0; i < 3; ++i) {
             std::cout << "Cord: " << counter++ << "\n";
             Cord::self().suspend([](CordHandle handle) { handle.spawn(); });
         }
-    };
+    }};
 
-    task.with_runtime(&rt);
-    rt.spawn(&task);
+    task->with_runtime(&rt);
+    rt.spawn(task);
 
     rt.run();
 }
