@@ -6,7 +6,7 @@
 #include "cord.hpp"
 
 namespace concord::cord {
-auto CordHandle::release() -> Cord* {
+auto CordHandle::release() noexcept -> Cord* {
     assert(is_valid());
     return std::exchange(_cord, nullptr);
 }

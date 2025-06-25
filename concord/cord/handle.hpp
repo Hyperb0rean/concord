@@ -26,7 +26,7 @@ class CordHandle {
   private:
     explicit CordHandle(Cord* cord) : _cord(cord) {}
 
-    auto release() -> Cord*;
+    auto release() noexcept -> Cord*;
 
   private:
     Cord* _cord {nullptr};
