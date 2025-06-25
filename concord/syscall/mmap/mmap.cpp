@@ -12,22 +12,23 @@
 
 namespace concord::syscall {
 
-auto MemoryAllocation::allocate() -> char* {
-    return concord::syscall::detail::mmap(
-        _start,
-        _size,
+std::size_t page_size = system_page_size;
+
+auto MemoryAllocation::allocate(std::size_t size) -> std::byte* {
+    return mmap(
+        nullptr,
+        size,
         PROT_READ | PROT_WRITE,
         MAP_ANONYMOUS | MAP_PRIVATE
     );
 }
 
 auto MemoryAllocation::protect() -> void {
-    // Change to PAGE_SIZE
-    concord::syscall::detail::mprotect(_start, 4096, PROT_NONE);
+    mprotect(data(), page_size, PROT_NONE);
 }
 
 auto MemoryAllocation::deallocate() noexcept -> void {
-    concord::syscall::detail::munmap(_start, _size);
+    munmap(data(), size());
 }
 
 } // namespace concord::syscall

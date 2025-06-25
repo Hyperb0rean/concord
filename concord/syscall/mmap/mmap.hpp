@@ -1,19 +1,19 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
-
-#include "concord/syscall/mmap/platform/mmap.hpp"
+#include <span>
 
 namespace concord::syscall {
 
-class MemoryAllocation final {
+class MemoryAllocation: public std::span<std::byte> {
   public:
-    MemoryAllocation(char* start, std::size_t size) :
-        _start(start),
-        _size(size) {
-        allocate();
+    explicit MemoryAllocation(std::size_t size) :
+        std::span<std::byte> {allocate(size), size} {
         protect();
+    }
+
+    auto view() const noexcept -> std::span<std::byte> {
+        return static_cast<std::span<std::byte> const&>(*this);
     }
 
     ~MemoryAllocation() {
@@ -21,12 +21,11 @@ class MemoryAllocation final {
     }
 
   private:
-    auto allocate() -> char*;
+    static auto allocate(std::size_t size) -> std::byte*;
     auto protect() -> void;
     auto deallocate() noexcept -> void;
-
-    char* _start;
-    std::size_t _size;
 };
+
+extern std::size_t page_size;
 
 } // namespace concord::syscall
