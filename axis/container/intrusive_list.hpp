@@ -63,6 +63,8 @@ class IntrusiveList final: private IntrusiveListNode<T, Tag> {
         using pointer = value_type*; // NOLINT
         using reference = value_type&; // NOLINT
 
+        IteratorImpl() = default;
+
         explicit IteratorImpl(Node* val) noexcept : _current(val) {}
 
         auto operator++() -> IteratorImpl& {
