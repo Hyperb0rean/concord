@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "concord/cord/context/context.hpp"
+#include "concord/cord/coroutine.hpp"
 #include "concord/cord/runnable.hpp"
 #include "concord/cord/stack.hpp"
 #include "concord/syscall/wait/wait.hpp"
@@ -59,13 +60,28 @@ auto context_test() -> void {
 
     concord::cord::context::Context main_context;
     coro.previous = &main_context;
+}
+
+auto context_test2() -> void {
+    auto stack = concord::cord::StackAllocator::allocate(1024 * 1024);
+
+    int counter = 0;
+
+    concord::cord::Coroutine coro = [&]() {
+        for (int i = 0; i < 3; ++i) {
+            std::cout << "Coroutine: " << counter++ << "\n";
+            coro.suspend();
+        }
+    };
+
+    coro.with_stack(stack.view());
 
     for (int i = 0; i < 3; ++i) {
         std::cout << "Main: " << counter << "\n";
-        main_context.switch_to(coro.context);
+        coro.resume();
     }
 }
 
 auto main() -> int {
-    context_test();
+    context_test2();
 }

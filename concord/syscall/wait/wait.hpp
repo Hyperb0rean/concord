@@ -3,6 +3,7 @@
 // Mostly copy of https://gitlab.com/Lipovsky/futex_like
 
 #include <atomic>
+#include <chrono>
 #include <cstdint>
 
 #include "concord/syscall/wait/atomic/u32.hpp"

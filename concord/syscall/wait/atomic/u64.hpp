@@ -1,6 +1,6 @@
 #pragma once
 
-#include <__bit/endian.h>
+#include <endian.h>
 
 #include <atomic>
 #include <cstdint>
@@ -72,11 +72,11 @@ class AtomicRefUint64 {
     }
 
     static constexpr auto is_little_endian() -> bool {
-        return std::endian::native == std::endian::little;
+        return __BYTE_ORDER == LITTLE_ENDIAN;
     }
 
     static constexpr auto is_big_endian() -> bool {
-        return std::endian::native == std::endian::big;
+        return __BYTE_ORDER == BIG_ENDIAN;
     }
 
   private:

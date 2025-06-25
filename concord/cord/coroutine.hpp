@@ -1,0 +1,38 @@
+#pragma once
+
+#include <functional>
+
+#include "concord/cord/context/context.hpp"
+#include "concord/cord/runnable.hpp"
+
+namespace concord::cord {
+
+class Coroutine: public IRunnable {
+  public:
+    template<std::invocable F>
+    Coroutine(F&& fn) : _func(std::forward<F>(fn)) {} // NOLINT
+
+    auto with_stack(Stack stack) -> void {
+        _callee_context.make(stack, this);
+    }
+
+    auto resume() -> void;
+
+    auto suspend() -> void;
+
+    auto is_completed() const -> bool;
+
+    auto run [[noreturn]] () noexcept -> void final;
+
+    ~Coroutine() = default;
+
+  private:
+    bool _is_completed {false};
+
+    std::move_only_function<void()> _func;
+
+    context::Context _callee_context;
+    context::Context _caller_context;
+};
+
+} // namespace concord::cord

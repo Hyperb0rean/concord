@@ -6,6 +6,8 @@
 
 namespace concord::cord {
 
+using Stack = std::span<std::byte>;
+
 class StackAllocator {
   public:
     static auto allocate(std::size_t size) -> syscall::MemoryAllocation {

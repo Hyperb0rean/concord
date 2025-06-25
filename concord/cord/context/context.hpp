@@ -3,12 +3,13 @@
 #include <span>
 
 #include "concord/cord/runnable.hpp"
+#include "concord/cord/stack.hpp"
 
 namespace concord::cord::context {
 struct Context {
     void* rsp;
 
-    auto make(std::span<std::byte> stack, IRunnable* fn) noexcept -> void;
+    auto make(Stack stack, IRunnable* fn) noexcept -> void;
     auto switch_to(Context& dest) noexcept -> void;
 };
 } // namespace concord::cord::context

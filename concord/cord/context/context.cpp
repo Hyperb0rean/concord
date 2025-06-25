@@ -1,6 +1,7 @@
 #include "context.hpp"
 
 #include "concord/cord/runnable.hpp"
+#include "concord/cord/stack.hpp"
 
 namespace concord::cord::context {
 
@@ -17,7 +18,7 @@ static auto context_thunk [[noreturn]] (
     runnable->run();
 }
 
-auto Context::make(std::span<std::byte> stack, IRunnable* fn) noexcept -> void {
+auto Context::make(Stack stack, IRunnable* fn) noexcept -> void {
     rsp = make_context(
         &stack.back(),
         reinterpret_cast<void*>(&context_thunk),
