@@ -19,7 +19,7 @@ class CordHandle {
 
     auto spawn() -> void;
 
-    auto switch_to() -> void;
+    auto resume() -> void;
 
     auto get() -> Cord*;
 

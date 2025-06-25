@@ -9,7 +9,9 @@ namespace concord::cord {
 
 auto Cord::with_stack(syscall::MemoryAllocation stack) -> void {
     _stack = std::move(stack);
-    _coroutine.with_stack(_stack.view().subspan(sizeof(stack)));
+    auto sz = _stack.view().size();
+    sz -= sizeof(Cord);
+    _coroutine.with_stack(_stack.view().subspan(0, sz));
 }
 
 auto Cord::with_runtime(runtime::IRuntime* rt) -> void {
@@ -30,7 +32,7 @@ auto Cord::spawn() -> void {
     _runtime->spawn(this);
 }
 
-auto Cord::switch_to() -> void {
+auto Cord::resume() -> void {
     // TODO
     // run() ?
 }

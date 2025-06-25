@@ -23,7 +23,7 @@ make_context:
     pushq %r14
     pushq %r15   
 
-    leaq  -0x8(%rsp), %rsp
+    subq $8, %rsp
     stmxcsr  (%rsp)     # MMX control- and status-word
     fnstcw   0x4(%rsp)  # save x87 control-word 
      
@@ -44,7 +44,7 @@ context_switch:
     pushq %r14
     pushq %r15
 
-    leaq  -0x8(%rsp), %rsp
+    subq $8, %rsp
     stmxcsr  (%rsp)     # MMX control- and status-word
     fnstcw   0x4(%rsp)  # save x87 control-word 
     

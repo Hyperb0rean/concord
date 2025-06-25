@@ -30,6 +30,6 @@ inline auto mprotect(std::byte* addr, std::size_t len, int prot) -> int {
     return res;
 }
 
-static constexpr std::size_t system_page_size = _SC_PAGESIZE;
+std::size_t system_page_size = ::sysconf(_SC_PAGESIZE);
 
 } // namespace

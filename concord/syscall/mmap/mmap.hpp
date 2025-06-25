@@ -14,11 +14,7 @@ class MemoryAllocation: private std::span<std::byte> {
     static auto deallocate(MemoryAllocation&&) noexcept -> void;
 
     auto view() const noexcept -> std::span<std::byte> {
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(&back());
-        uintptr_t aligned = ptr & ~(_align - 1);
-        assert(aligned <= ptr);
-        uintptr_t diff = ptr - aligned;
-        return {begin(), size() - diff};
+        return {data(), size()};
     }
 
     MemoryAllocation() = default;

@@ -41,29 +41,35 @@ auto operator new(std::size_t sz) -> void* {
     return malloc(sz);
 }
 
+auto operator new(std::size_t sz, std::align_val_t align) -> void* {
+    ++allocated;
+    return aligned_alloc(sz, static_cast<std::size_t>(align));
+}
+
 auto cord_test() -> void {
     using namespace concord::cord; // NOLINT
     concord::runtime::loop::Loop rt;
 
     int counter = 0;
 
-    go(rt, [&]() {
+    go(rt, [&] {
         for (int i = 0; i < 3; ++i) {
             std::cout << "Cord 1: " << counter++ << "\n";
-            concord::cord::yield();
+            yield();
         }
     });
 
-    go(rt, [&]() {
+    go(rt, [&] {
         for (int i = 0; i < 3; ++i) {
             std::cout << "Cord 2: " << counter++ << "\n";
-            concord::cord::yield();
+            go([&] { std::cout << "Inner Cord: " << counter++ << "\n"; });
+            yield();
         }
     });
 
     rt.run();
 
-    fmt::println("{}", allocated);
+    fmt::println("allocations: {}", allocated);
 }
 
 auto main() -> int {

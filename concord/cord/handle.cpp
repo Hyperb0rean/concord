@@ -15,8 +15,8 @@ auto CordHandle::spawn() -> void {
     release()->spawn();
 }
 
-auto CordHandle::switch_to() -> void {
-    release()->switch_to();
+auto CordHandle::resume() -> void {
+    release()->resume();
 }
 
 auto CordHandle::get() -> Cord* {

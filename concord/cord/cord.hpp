@@ -32,7 +32,7 @@ class Cord:
     auto suspend(Awaiter) -> void;
 
     auto spawn() -> void;
-    auto switch_to() -> void;
+    auto resume() -> void;
 
     static auto self() -> Cord&;
 

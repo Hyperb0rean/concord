@@ -2,6 +2,8 @@
 
 #include "mmap.hpp"
 
+#include "fmt/base.h"
+
 #ifdef LINUX
     #include "platform/posix.hpp"
 #elif APPLE
