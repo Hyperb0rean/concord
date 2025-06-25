@@ -6,9 +6,9 @@
 
 #include "concord/cord/context/context.hpp"
 #include "concord/cord/cord.hpp"
-#include "concord/cord/coroutine.hpp"
-#include "concord/cord/runnable.hpp"
+#include "concord/cord/go.hpp"
 #include "concord/cord/stack.hpp"
+#include "concord/cord/suspend.hpp"
 #include "concord/runtime/loop/loop.hpp"
 #include "concord/syscall/wait/wait.hpp"
 #include "fmt/core.h"
@@ -47,27 +47,19 @@ auto cord_test() -> void {
 
     int counter = 0;
 
-    auto stack1 = StackAllocator::allocate(Cord::stack_size, alignof(Cord));
-    auto* task1 = new (&stack1.view().back()) concord::cord::Cord {[&]() {
+    go(rt, [&]() {
         for (int i = 0; i < 3; ++i) {
             std::cout << "Cord 1: " << counter++ << "\n";
-            Cord::self().suspend([](CordHandle handle) { handle.spawn(); });
+            concord::cord::yield();
         }
-    }};
-    task1->with_stack(stack1);
-    task1->with_runtime(&rt);
-    rt.spawn(task1);
+    });
 
-    auto stack2 = StackAllocator::allocate(Cord::stack_size, alignof(Cord));
-    auto* task2 = new (&stack2.view().back()) concord::cord::Cord {[&]() {
+    go(rt, [&]() {
         for (int i = 0; i < 3; ++i) {
             std::cout << "Cord 2: " << counter++ << "\n";
-            Cord::self().suspend([](CordHandle handle) { handle.spawn(); });
+            concord::cord::yield();
         }
-    }};
-    task2->with_stack(stack2);
-    task2->with_runtime(&rt);
-    rt.spawn(task2);
+    });
 
     rt.run();
 
