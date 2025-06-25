@@ -9,8 +9,8 @@
 #include "concord/cord/go.hpp"
 #include "concord/cord/stack.hpp"
 #include "concord/cord/suspend.hpp"
+#include "concord/os/wait/wait.hpp"
 #include "concord/runtime/loop/loop.hpp"
-#include "concord/syscall/wait/wait.hpp"
 #include "fmt/core.h"
 
 auto wait_test() -> void {
@@ -18,16 +18,15 @@ auto wait_test() -> void {
     auto producer = std::thread([&] {
         using namespace std::chrono_literals;
         std::this_thread::sleep_for(1s);
-        auto&& token = concord::syscall::prepare_wake(
-            concord::syscall::AtomicRefUint64Low {flag}
-        );
+        auto&& token =
+            concord::os::prepare_wake(concord::os::AtomicRefUint64Low {flag});
         std::cout << "Awaken" << std::endl;
         flag.store(1);
-        concord::syscall::wake_one(std::move(token));
+        concord::os::wake_one(std::move(token));
     });
     std::cout << "Sleept" << std::endl;
-    concord::syscall::wait(
-        concord::syscall::AtomicRefUint64Low {flag},
+    concord::os::wait(
+        concord::os::AtomicRefUint64Low {flag},
         0,
         std::memory_order::seq_cst
     );
@@ -74,4 +73,5 @@ auto cord_test() -> void {
 
 auto main() -> int {
     cord_test();
+    wait_test();
 }

@@ -5,7 +5,7 @@
 #include <memory>
 #include <span>
 
-namespace concord::syscall {
+namespace concord::os {
 
 class MemoryAllocation: private std::span<std::byte> {
   public:
@@ -31,4 +31,4 @@ class MemoryAllocation: private std::span<std::byte> {
 
 extern std::size_t page_size;
 
-} // namespace concord::syscall
+} // namespace concord::os

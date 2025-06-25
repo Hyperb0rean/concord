@@ -1,5 +1,6 @@
 #pragma once
-#include "wait.hpp"
+#include <cstddef>
+#include <cstdint>
 
 #ifdef WIN32
     #include "synchapi.h"
@@ -15,19 +16,18 @@ int WakeByAddressSingle(void* addr); //NOLINT
 int WakeByAddressAll(void* addr); //NOLINT
 #endif
 
-namespace concord::syscall::detail {
+namespace {
 
-inline auto wait_timed(uint32_t* addr, uint32_t expected, uint32_t millis)
-    -> int {
+auto wait_timed(uint32_t* addr, uint32_t expected, uint32_t millis) -> int {
     return WaitOnAddress(addr, expected, 4, millis);
 }
 
-inline auto wait(uint32_t* addr, uint32_t old) -> int {
+auto wait(uint32_t* addr, uint32_t old) -> int {
     return wait_timed(addr, old, /*millis=*/0);
 }
 
-inline auto wake(uint32_t* addr, size_t count) -> int {
+auto wake(uint32_t* addr, std::size_t count) -> int {
     return (count == 1) ? WakeByAddressSingle(addr) : WakeByAddressAll(addr);
 }
 
-} // namespace concord::syscall::detail
+} // namespace

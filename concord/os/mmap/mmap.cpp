@@ -12,7 +12,7 @@
     #include "platform/windows.hpp"
 #endif
 
-namespace concord::syscall {
+namespace concord::os {
 
 std::size_t page_size = system_page_size;
 
@@ -38,4 +38,4 @@ auto MemoryAllocation::deallocate(MemoryAllocation&& allocation) noexcept
     munmap(allocation.data(), allocation.size());
 }
 
-} // namespace concord::syscall
+} // namespace concord::os

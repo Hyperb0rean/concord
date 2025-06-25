@@ -3,9 +3,8 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+#include <cstdint>
 #include <ctime>
-
-#include "wait.hpp"
 
 namespace {
 // NOLINTNEXTLINE
@@ -21,8 +20,8 @@ int futex(
 }
 } // namespace
 
-namespace concord::syscall::detail {
-inline auto wait_timed(uint32_t* addr, uint32_t old, uint32_t millis) -> int {
+namespace {
+auto wait_timed(uint32_t* addr, uint32_t old, uint32_t millis) -> int {
     struct timespec timeout;
     timeout.tv_sec = millis / 1000;
     timeout.tv_nsec = (millis % 1000) * 1000'000;
@@ -30,12 +29,12 @@ inline auto wait_timed(uint32_t* addr, uint32_t old, uint32_t millis) -> int {
     return futex(addr, FUTEX_WAIT_PRIVATE, old, &timeout, nullptr, 0);
 }
 
-inline auto wait(uint32_t* addr, uint32_t old) -> int {
+auto wait(uint32_t* addr, uint32_t old) -> int {
     return futex(addr, FUTEX_WAIT_PRIVATE, old, nullptr, nullptr, 0);
 }
 
-inline auto wake(uint32_t* addr, size_t count) -> int {
+auto wake(uint32_t* addr, size_t count) -> int {
     return futex(addr, FUTEX_WAKE_PRIVATE, (int)count, nullptr, nullptr, 0);
 }
 
-} // namespace concord::syscall::detail
+} // namespace

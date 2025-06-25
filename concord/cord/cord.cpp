@@ -7,7 +7,7 @@
 
 namespace concord::cord {
 
-auto Cord::with_stack(syscall::MemoryAllocation stack) -> void {
+auto Cord::with_stack(os::MemoryAllocation stack) -> void {
     _stack = std::move(stack);
     auto sz = _stack.view().size();
     sz -= sizeof(Cord);

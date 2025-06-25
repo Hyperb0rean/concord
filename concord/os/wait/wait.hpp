@@ -6,10 +6,10 @@
 #include <chrono>
 #include <cstdint>
 
-#include "concord/syscall/wait/atomic/u32.hpp"
-#include "concord/syscall/wait/atomic/u64.hpp"
+#include "concord/os/wait/atomic/u32.hpp"
+#include "concord/os/wait/atomic/u64.hpp"
 
-namespace concord::syscall {
+namespace concord::os {
 
 using AtomicRefUint64Low =
     atomic::AtomicRefUint64<atomic::AtomicHalfUint64::Low>;
@@ -66,4 +66,4 @@ auto prepare_wake(atomic::AtomicRefUint64<Half> atomic_ref) -> WakeToken {
 auto wake_one(WakeToken token) -> void;
 auto wake_all(WakeToken token) -> void;
 
-} // namespace concord::syscall
+} // namespace concord::os

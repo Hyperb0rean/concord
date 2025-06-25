@@ -2,14 +2,13 @@
 
 #include "concord/cord/awaiter.hpp"
 #include "concord/cord/coroutine.hpp"
+#include "concord/os/mmap/mmap.hpp"
 #include "concord/runtime/intrusive_task.hpp"
 #include "concord/runtime/runtime.hpp"
 
 namespace concord::cord {
 
-class Cord:
-    public runtime::IntrusiveTask,
-    public axis::IntrusiveListNode<Cord> {
+class Cord: public runtime::IntrusiveTask {
   public:
     template<std::invocable F>
     Cord(F&& fn) : _coroutine(std::forward<F>(fn)) { // NOLINT
@@ -24,7 +23,7 @@ class Cord:
 
     ~Cord() = default;
 
-    auto with_stack(syscall::MemoryAllocation stack) -> void;
+    auto with_stack(os::MemoryAllocation stack) -> void;
 
     auto with_runtime(runtime::IRuntime* rt) -> void;
     auto runtime() const -> runtime::IRuntime*;
@@ -41,7 +40,7 @@ class Cord:
     static constexpr size_t stack_size = 4096 * 1024;
 
   private:
-    syscall::MemoryAllocation _stack;
+    os::MemoryAllocation _stack;
 
     runtime::IRuntime* _runtime {nullptr};
     Coroutine _coroutine;

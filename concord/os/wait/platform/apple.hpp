@@ -1,5 +1,6 @@
 #pragma once
-#include "wait.hpp"
+#include <cstddef>
+#include <cstdint>
 
 // NOLINTNEXTLINE
 extern "C" int __ulock_wait(
@@ -16,7 +17,7 @@ __ulock_wake(uint32_t operation, void* addr, uint64_t wake_value); // NOLINT
 #define UL_COMPARE_AND_WAIT 1
 #define ULF_WAKE_ALL 0x00000100
 
-namespace concord::syscall::detail {
+namespace concord::os::detail {
 
 inline auto wait_timed(uint32_t* addr, uint32_t expected, uint32_t millis)
     -> int {
@@ -35,4 +36,4 @@ inline auto wake(uint32_t* addr, size_t count) -> int {
     );
 }
 
-} // namespace concord::syscall::detail
+} // namespace concord::os::detail

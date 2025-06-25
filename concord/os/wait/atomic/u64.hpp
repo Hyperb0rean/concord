@@ -7,7 +7,7 @@
 
 #include "axis/core/bithacks.hpp"
 
-namespace concord::syscall::atomic {
+namespace concord::os::atomic {
 
 enum class AtomicHalfUint64 {
     Low = 0,
@@ -83,4 +83,4 @@ class AtomicRefUint64 {
     std::atomic<uint64_t>* _atomic;
 };
 
-} // namespace concord::syscall::atomic
+} // namespace concord::os::atomic

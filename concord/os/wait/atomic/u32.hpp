@@ -3,7 +3,7 @@
 #include <atomic>
 #include <cstdint>
 
-namespace concord::syscall::atomic {
+namespace concord::os::atomic {
 
 class AtomicRefUint32 {
   public:

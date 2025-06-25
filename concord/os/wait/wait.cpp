@@ -1,10 +1,10 @@
 
 
-#include "concord/syscall/wait/atomic/wait.hpp"
+#include "concord/os/wait/atomic/wait.hpp"
 
-#include "concord/syscall/wait/atomic/u32.hpp"
-#include "concord/syscall/wait/atomic/u64.hpp"
-#include "concord/syscall/wait/wait.hpp"
+#include "concord/os/wait/atomic/u32.hpp"
+#include "concord/os/wait/atomic/u64.hpp"
+#include "concord/os/wait/wait.hpp"
 
 #ifdef LINUX
     #include "platform/linux.hpp"
@@ -14,7 +14,7 @@
     #include "platform/windows.hpp"
 #endif
 
-namespace concord::syscall {
+namespace concord::os {
 
 auto wait(std::atomic<uint32_t>& atomic, uint32_t old, std::memory_order mo)
     -> uint32_t {
@@ -46,10 +46,10 @@ auto wait_timed(
 ) -> void {}
 
 auto wake_one(WakeToken token) -> void {
-    detail::wake(token.location, 1);
+    wake(token.location, 1);
 }
 
 auto wake_all(WakeToken token) -> void {
-    detail::wake(token.location, std::numeric_limits<uint32_t>::max());
+    wake(token.location, std::numeric_limits<uint32_t>::max());
 }
-} // namespace concord::syscall
+} // namespace concord::os
