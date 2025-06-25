@@ -7,6 +7,11 @@
 
 namespace concord::cord {
 
+auto Cord::with_stack(Stack stack) -> void {
+    _stack = std::move(stack);
+    _coroutine.with_stack(_stack.subspan(sizeof(stack)));
+}
+
 auto Cord::with_runtime(runtime::IRuntime* rt) -> void {
     _runtime = rt;
 }
@@ -39,7 +44,7 @@ auto Cord::run() noexcept -> void {
     _coroutine.resume();
 
     if (_coroutine.is_completed()) {
-        delete this;
+        this->~Cord();
         Current::set(nullptr);
     } else {
         _awaiter(CordHandle {this});

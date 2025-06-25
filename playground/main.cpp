@@ -34,23 +34,36 @@ auto wait_test() -> void {
     producer.join();
 }
 
+std::size_t allocated;
+
+auto operator new(std::size_t sz) -> void* {
+    ++allocated;
+    return malloc(sz);
+}
+
 auto cord_test() -> void {
     using namespace concord::cord; // NOLINT
     concord::runtime::loop::Loop rt;
 
     int counter = 0;
 
-    auto* task = new concord::cord::Cord {[&]() {
+    auto stack = StackAllocator::allocate(Cord::stack_size, alignof(Cord));
+
+    auto* task = new (&stack.view().back()) concord::cord::Cord {[&]() {
         for (int i = 0; i < 3; ++i) {
             std::cout << "Cord: " << counter++ << "\n";
             Cord::self().suspend([](CordHandle handle) { handle.spawn(); });
         }
     }};
 
+    task->with_stack(stack.view());
+
     task->with_runtime(&rt);
     rt.spawn(task);
 
     rt.run();
+
+    fmt::println("{}", allocated);
 }
 
 auto main() -> int {

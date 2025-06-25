@@ -13,7 +13,6 @@ class Cord:
   public:
     template<std::invocable F>
     Cord(F&& fn) : _coroutine(std::forward<F>(fn)) { // NOLINT
-        _coroutine.with_stack(_stack.view());
     }
 
     // Non-movable
@@ -24,6 +23,8 @@ class Cord:
     auto operator=(const Cord&) -> Cord& = delete;
 
     ~Cord() = default;
+
+    auto with_stack(Stack stack) -> void;
 
     auto with_runtime(runtime::IRuntime* rt) -> void;
     auto runtime() const -> runtime::IRuntime*;
@@ -37,9 +38,10 @@ class Cord:
 
     auto run() noexcept -> void final;
 
-  private:
     static constexpr size_t stack_size = 4096 * 1024;
-    syscall::MemoryAllocation _stack {StackAllocator::allocate(stack_size)};
+
+  private:
+    Stack _stack;
 
     runtime::IRuntime* _runtime {nullptr};
     Coroutine _coroutine;

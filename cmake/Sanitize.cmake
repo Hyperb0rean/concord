@@ -19,8 +19,8 @@ endif()
 # Address Sanitizer
 # https://clang.llvm.org/docs/AddressSanitizer.html
 
-set(ASAN_COMPILE_FLAGS -fsanitize=address,undefined -fno-sanitize-recover=all)
-set(ASAN_LINK_FLAGS -fsanitize=address,undefined)
+set(ASAN_COMPILE_FLAGS -fsanitize=address,undefined,leak -fno-sanitize-recover=all)
+set(ASAN_LINK_FLAGS -fsanitize=address,undefined,leak)
 
 if(CMAKE_BUILD_TYPE MATCHES Asan)
     message(STATUS "Sanitize with Address Sanitizer (ASAN)")
