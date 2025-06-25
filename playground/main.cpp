@@ -5,9 +5,11 @@
 #include <thread>
 
 #include "concord/cord/context/context.hpp"
+#include "concord/cord/cord.hpp"
 #include "concord/cord/coroutine.hpp"
 #include "concord/cord/runnable.hpp"
 #include "concord/cord/stack.hpp"
+#include "concord/runtime/loop/loop.hpp"
 #include "concord/syscall/wait/wait.hpp"
 #include "fmt/core.h"
 
@@ -82,6 +84,25 @@ auto context_test2() -> void {
     }
 }
 
+auto cord_test() -> void {
+    using namespace concord::cord; // NOLINT
+    concord::runtime::loop::Loop rt;
+
+    int counter = 0;
+
+    concord::cord::Cord task = [&]() {
+        for (int i = 0; i < 3; ++i) {
+            std::cout << "Cord: " << counter++ << "\n";
+            Cord::self().suspend([](CordHandle handle) { handle.spawn(); });
+        }
+    };
+
+    task.with_runtime(&rt);
+    rt.spawn(&task);
+
+    rt.run();
+}
+
 auto main() -> int {
-    context_test2();
+    cord_test();
 }

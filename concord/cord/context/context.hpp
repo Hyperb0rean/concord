@@ -1,7 +1,5 @@
 #pragma once
 
-#include <span>
-
 #include "concord/cord/runnable.hpp"
 #include "concord/cord/stack.hpp"
 
