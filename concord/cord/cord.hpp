@@ -24,7 +24,7 @@ class Cord:
 
     ~Cord() = default;
 
-    auto with_stack(Stack stack) -> void;
+    auto with_stack(syscall::MemoryAllocation stack) -> void;
 
     auto with_runtime(runtime::IRuntime* rt) -> void;
     auto runtime() const -> runtime::IRuntime*;
@@ -41,7 +41,7 @@ class Cord:
     static constexpr size_t stack_size = 4096 * 1024;
 
   private:
-    Stack _stack;
+    syscall::MemoryAllocation _stack;
 
     runtime::IRuntime* _runtime {nullptr};
     Coroutine _coroutine;

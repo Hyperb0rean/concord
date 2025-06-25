@@ -47,19 +47,27 @@ auto cord_test() -> void {
 
     int counter = 0;
 
-    auto stack = StackAllocator::allocate(Cord::stack_size, alignof(Cord));
-
-    auto* task = new (&stack.view().back()) concord::cord::Cord {[&]() {
+    auto stack1 = StackAllocator::allocate(Cord::stack_size, alignof(Cord));
+    auto* task1 = new (&stack1.view().back()) concord::cord::Cord {[&]() {
         for (int i = 0; i < 3; ++i) {
-            std::cout << "Cord: " << counter++ << "\n";
+            std::cout << "Cord 1: " << counter++ << "\n";
             Cord::self().suspend([](CordHandle handle) { handle.spawn(); });
         }
     }};
+    task1->with_stack(stack1);
+    task1->with_runtime(&rt);
+    rt.spawn(task1);
 
-    task->with_stack(stack.view());
-
-    task->with_runtime(&rt);
-    rt.spawn(task);
+    auto stack2 = StackAllocator::allocate(Cord::stack_size, alignof(Cord));
+    auto* task2 = new (&stack2.view().back()) concord::cord::Cord {[&]() {
+        for (int i = 0; i < 3; ++i) {
+            std::cout << "Cord 2: " << counter++ << "\n";
+            Cord::self().suspend([](CordHandle handle) { handle.spawn(); });
+        }
+    }};
+    task2->with_stack(stack2);
+    task2->with_runtime(&rt);
+    rt.spawn(task2);
 
     rt.run();
 

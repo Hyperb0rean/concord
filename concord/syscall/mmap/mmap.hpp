@@ -9,13 +9,9 @@ namespace concord::syscall {
 
 class MemoryAllocation: private std::span<std::byte> {
   public:
-    MemoryAllocation() = default;
-
-    explicit MemoryAllocation(std::size_t size, std::size_t align) :
-        std::span<std::byte> {allocate(size), size},
-        _align {align} {
-        protect();
-    }
+    static auto allocate(std::size_t size, std::size_t align)
+        -> MemoryAllocation;
+    static auto deallocate(MemoryAllocation&&) noexcept -> void;
 
     auto view() const noexcept -> std::span<std::byte> {
         uintptr_t ptr = reinterpret_cast<uintptr_t>(&back());
@@ -25,14 +21,14 @@ class MemoryAllocation: private std::span<std::byte> {
         return {begin(), size() - diff};
     }
 
-    ~MemoryAllocation() {
-        deallocate();
-    }
+    MemoryAllocation() = default;
 
   private:
-    static auto allocate(std::size_t size) -> std::byte*;
+    MemoryAllocation(std::byte* ptr, std::size_t size, std::size_t align) :
+        std::span<std::byte> {ptr, size},
+        _align {align} {}
+
     auto protect() -> void;
-    auto deallocate() noexcept -> void;
 
     std::size_t _align;
 };

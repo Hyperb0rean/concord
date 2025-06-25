@@ -10,6 +10,7 @@ namespace {
 inline auto mmap(std::byte* addr, std::size_t length, int prot, int flags)
     -> std::byte* {
     auto* res = ::mmap(static_cast<void*>(addr), length, prot, flags, -1, 0);
+
     if (res == MAP_FAILED) {
         throw std::system_error {errno, std::generic_category()};
     }

@@ -9,12 +9,17 @@ namespace concord::cord {
 using Stack = std::span<std::byte>;
 
 class StackAllocator {
+    // TODO: Make Stack pool
   public:
     static auto allocate(std::size_t size, std::size_t align = 1)
         -> syscall::MemoryAllocation {
         assert(size % syscall::page_size);
         const std::size_t total_size = size + syscall::page_size;
-        return syscall::MemoryAllocation(total_size, align);
+        return syscall::MemoryAllocation::allocate(total_size, align);
+    }
+
+    static auto dellocate(syscall::MemoryAllocation allocation) -> void {
+        syscall::MemoryAllocation::deallocate(std::move(allocation));
     }
 };
 

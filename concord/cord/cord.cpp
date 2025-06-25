@@ -7,9 +7,9 @@
 
 namespace concord::cord {
 
-auto Cord::with_stack(Stack stack) -> void {
+auto Cord::with_stack(syscall::MemoryAllocation stack) -> void {
     _stack = std::move(stack);
-    _coroutine.with_stack(_stack.subspan(sizeof(stack)));
+    _coroutine.with_stack(_stack.view().subspan(sizeof(stack)));
 }
 
 auto Cord::with_runtime(runtime::IRuntime* rt) -> void {
@@ -44,7 +44,9 @@ auto Cord::run() noexcept -> void {
     _coroutine.resume();
 
     if (_coroutine.is_completed()) {
+        auto stack = _stack;
         this->~Cord();
+        StackAllocator::dellocate(stack);
         Current::set(nullptr);
     } else {
         _awaiter(CordHandle {this});

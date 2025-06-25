@@ -7,12 +7,13 @@ file(GLOB_RECURSE LIB_CXX_SOURCES ${LIB_PATH} *.cpp)
 file(GLOB_RECURSE LIB_HEADERS ${LIB_PATH} *.hpp)
 
 set(CONTEXT "${LIB_PATH}/cord/context/context.S")
-
 enable_language(ASM)
 set_property(SOURCE ${CONTEXT} PROPERTY LANGUAGE ASM)
 
+file(GLOB_RECURSE LIB_SANITIZER "/lib/clang/20/include/sanitizer" *.h)
+
 add_library(${LIB_TARGET} STATIC ${CONTEXT} ${LIB_CXX_SOURCES} ${LIB_HEADERS})
-target_include_directories(${LIB_TARGET} PUBLIC ${LIB_INCLUDE_PATH})
+target_include_directories(${LIB_TARGET} PUBLIC ${LIB_INCLUDE_PATH} ${LIB_SANITIZER})
 
 set(LIB_DEPENDENCIES fmt axis)
 target_link_libraries(${LIB_TARGET} PUBLIC ${LIB_DEPENDENCIES})
