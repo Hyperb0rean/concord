@@ -8,6 +8,7 @@
 #include "concord/cord/runnable.hpp"
 #include "concord/cord/stack.hpp"
 #include "concord/syscall/wait/wait.hpp"
+#include "fmt/core.h"
 
 auto wait_test() -> void {
     std::atomic<uint64_t> flag {0};

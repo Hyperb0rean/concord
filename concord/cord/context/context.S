@@ -8,8 +8,6 @@ make_context:
     # rdx - runnable
     movq %rsp, %r11
     movq %rdi, %rsp
-
-    subq $64, %rsp
     
     andq $-16, %rsp              
     subq $8, %rsp
@@ -23,8 +21,12 @@ make_context:
     pushq %r12
     pushq %r13
     pushq %r14
-    pushq %r15    
+    pushq %r15   
 
+    leaq  -0x8(%rsp), %rsp
+    stmxcsr  (%rsp)     # MMX control- and status-word
+    fnstcw   0x4(%rsp)  # save x87 control-word 
+     
     movq %rsp, %rax
     
     movq %r11, %rsp
@@ -41,11 +43,19 @@ context_switch:
     pushq %r13
     pushq %r14
     pushq %r15
+
+    leaq  -0x8(%rsp), %rsp
+    stmxcsr  (%rsp)     # MMX control- and status-word
+    fnstcw   0x4(%rsp)  # save x87 control-word 
     
     movq %rsp, (%rdi)
     
     movq (%rsi), %rsp
-    
+
+    ldmxcsr  (%rsp)     # MMX control- and status-word
+    fldcw   0x4(%rsp)  # save x87 control-word 
+    leaq  0x8(%rsp), %rsp
+
     popq %r15
     popq %r14
     popq %r13
