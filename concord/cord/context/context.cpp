@@ -4,8 +4,7 @@
 
 namespace concord::cord::context {
 
-[[noreturn]]
-static auto context_thunk(
+static auto context_thunk [[noreturn]] (
     void*,
     void*,
     void*,

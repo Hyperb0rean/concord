@@ -4,9 +4,12 @@
 #include <iostream>
 #include <thread>
 
+#include "concord/cord/context/context.hpp"
+#include "concord/cord/runnable.hpp"
+#include "concord/cord/stack.hpp"
 #include "concord/syscall/wait/wait.hpp"
 
-auto main() -> int {
+auto wait_test() -> void {
     std::atomic<uint64_t> flag {0};
     auto producer = std::thread([&] {
         using namespace std::chrono_literals;
@@ -25,4 +28,43 @@ auto main() -> int {
         std::memory_order::seq_cst
     );
     producer.join();
+}
+
+class ExampleCoroutine: public concord::cord::IRunnable {
+  public:
+    explicit ExampleCoroutine(int& counter) : _counter(counter) {}
+
+    auto run [[noreturn]] () noexcept -> void final {
+        while (true) {
+            std::cout << "Coroutine: " << _counter++ << "\n";
+            context.switch_to(*previous);
+        }
+    }
+
+    concord::cord::context::Context context;
+    concord::cord::context::Context* previous;
+
+  private:
+    int& _counter;
+};
+
+auto context_test() -> void {
+    auto stack = concord::cord::StackAllocator::allocate(1024 * 1024);
+
+    int counter = 0;
+    ExampleCoroutine coro(counter);
+
+    coro.context.make(stack.view(), &coro);
+
+    concord::cord::context::Context main_context;
+    coro.previous = &main_context;
+
+    for (int i = 0; i < 3; ++i) {
+        std::cout << "Main: " << counter << "\n";
+        main_context.switch_to(coro.context);
+    }
+}
+
+auto main() -> int {
+    context_test();
 }
