@@ -49,24 +49,23 @@ auto operator new(std::size_t sz, std::align_val_t align) -> void* {
 auto cord_test() -> void {
     using namespace concord::cord; // NOLINT
     concord::rt::thread::ThreadPool rt {4};
-    // concord::rt::loop::Loop rt;
 
-    int counter = 0;
+    std::atomic<int> counter = 0;
+    rt.run();
 
-    go(rt, [=] mutable {
+    go(rt, [&] mutable {
         for (int i = 0; i < 3; ++i) {
             fmt::println("Cord 1: {}", counter++);
             yield();
         }
     });
 
-    go(rt, [=] mutable {
+    go(rt, [&] mutable {
         for (int i = 0; i < 3; ++i) {
             fmt::println("Cord 2: {}", counter++);
             yield();
         }
     });
-    rt.run();
 
     rt.stop();
 

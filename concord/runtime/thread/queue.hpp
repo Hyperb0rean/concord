@@ -4,7 +4,6 @@
 #include <mutex>
 
 #include "axis/container/intrusive_list.hpp"
-#include "axis/monad/maybe/type.hpp"
 #include "concord/os/sync/mutex.hpp"
 #include "concord/os/wait/wait.hpp"
 
@@ -23,18 +22,17 @@ class UnboundedBlockingQueue {
 
     auto pop() -> T* {
         std::unique_lock guard {_mutex};
-        uint32_t size;
-        while ((size = _size.load(std::memory_order::relaxed)),
-               size == 0 && size != sentinel) {
+        uint32_t size = _size.load(std::memory_order::relaxed);
+        while (size == 0 && size != sentinel) {
             guard.unlock();
-            os::wait(_size, size, std::memory_order::relaxed);
+            size = os::wait(_size, size, std::memory_order::relaxed);
             guard.lock();
         }
         if (_queue.is_empty()) {
             return nullptr;
         }
         auto* item = _queue.pop_front();
-        auto prev = _size.fetch_sub(1);
+        auto prev = _size.fetch_sub(1, std::memory_order::relaxed);
         assert(prev != 0);
         return item;
     }
