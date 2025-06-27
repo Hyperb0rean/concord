@@ -11,6 +11,7 @@
 #include "concord/cord/suspend.hpp"
 #include "concord/os/wait/wait.hpp"
 #include "concord/runtime/loop/loop.hpp"
+#include "concord/runtime/thread/thread_pool.hpp"
 #include "fmt/core.h"
 
 auto wait_test() -> void {
@@ -35,43 +36,45 @@ auto wait_test() -> void {
 
 std::size_t allocated;
 
-auto operator new(std::size_t sz) -> void* {
-    ++allocated;
-    return malloc(sz);
-}
+// auto operator new(std::size_t sz) -> void* {
+//     ++allocated;
+//     return malloc(sz);
+// }
 
-auto operator new(std::size_t sz, std::align_val_t align) -> void* {
-    ++allocated;
-    return aligned_alloc(sz, static_cast<std::size_t>(align));
-}
+// auto operator new(std::size_t sz, std::align_val_t align) -> void* {
+//     ++allocated;
+//     return aligned_alloc(sz, static_cast<std::size_t>(align));
+// }
 
 auto cord_test() -> void {
     using namespace concord::cord; // NOLINT
-    concord::runtime::loop::Loop rt;
+    concord::rt::thread::ThreadPool rt {4};
+    // concord::rt::loop::Loop rt;
 
     int counter = 0;
 
     go(rt, [&] {
         for (int i = 0; i < 3; ++i) {
-            std::cout << "Cord 1: " << counter++ << "\n";
+            fmt::println("Cord 1: {}", counter++);
             yield();
         }
     });
 
     go(rt, [&] {
         for (int i = 0; i < 3; ++i) {
-            std::cout << "Cord 2: " << counter++ << "\n";
-            go([&] { std::cout << "Inner Cord: " << counter++ << "\n"; });
+            fmt::println("Cord 2: {}", counter++);
+            go([&] { fmt::println("Inner: {}", counter++); });
             yield();
         }
     });
-
     rt.run();
+
+    rt.stop();
 
     fmt::println("allocations: {}", allocated);
 }
 
 auto main() -> int {
     cord_test();
-    wait_test();
+    // wait_test();
 }

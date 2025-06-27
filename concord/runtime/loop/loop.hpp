@@ -6,7 +6,7 @@
 #include "concord/runtime/intrusive_task.hpp"
 #include "concord/runtime/runtime.hpp"
 
-namespace concord::runtime::loop {
+namespace concord::rt::loop {
 class Loop: public IRuntime {
   public:
     Loop() = default;
@@ -26,4 +26,4 @@ class Loop: public IRuntime {
   private:
     axis::IntrusiveList<IntrusiveTask> _tasks;
 };
-} // namespace concord::runtime::loop
+} // namespace concord::rt::loop

@@ -15,7 +15,7 @@ class Mutex {
         enum _ : std::uint32_t { Free = 0, Locked = 1, Awaited = 2 };
     };
 
-    std::atomic<uint32_t> _state {State::Free};
+    std::atomic<std::uint32_t> _state {State::Free};
 };
 
 } // namespace concord::os::sync

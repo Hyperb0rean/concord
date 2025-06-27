@@ -1,6 +1,6 @@
 #include "loop.hpp"
 
-namespace concord::runtime::loop {
+namespace concord::rt::loop {
 void Loop::spawn(ITask* task) {
     _tasks.push_back(static_cast<IntrusiveTask*>(task));
 }
@@ -14,4 +14,4 @@ auto Loop::run() -> std::size_t {
     }
     return runned;
 }
-} // namespace concord::runtime::loop
+} // namespace concord::rt::loop

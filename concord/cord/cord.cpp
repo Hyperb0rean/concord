@@ -14,11 +14,11 @@ auto Cord::with_stack(os::MemoryAllocation stack) -> void {
     _coroutine.with_stack(_stack.view().subspan(0, sz));
 }
 
-auto Cord::with_runtime(runtime::IRuntime* rt) -> void {
+auto Cord::with_runtime(rt::IRuntime* rt) -> void {
     _runtime = rt;
 }
 
-auto Cord::runtime() const -> runtime::IRuntime* {
+auto Cord::runtime() const -> rt::IRuntime* {
     return _runtime;
 }
 

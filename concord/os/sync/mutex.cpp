@@ -11,7 +11,7 @@ auto Mutex::lock() -> void {
     Spinner spinner;
     uint32_t current = State::Free;
 
-    while (_state.compare_exchange_weak(
+    while (!_state.compare_exchange_weak(
         current,
         State::Locked,
         std::memory_order::acquire,

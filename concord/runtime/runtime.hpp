@@ -2,7 +2,7 @@
 
 #include "concord/runtime/task.hpp"
 
-namespace concord::runtime {
+namespace concord::rt {
 struct IRuntime {
     virtual auto spawn(ITask*) -> void = 0;
 

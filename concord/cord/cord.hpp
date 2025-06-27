@@ -8,7 +8,7 @@
 
 namespace concord::cord {
 
-class Cord: public runtime::IntrusiveTask {
+class Cord: public rt::IntrusiveTask {
   public:
     template<std::invocable F>
     Cord(F&& fn) : _coroutine(std::forward<F>(fn)) { // NOLINT
@@ -25,8 +25,8 @@ class Cord: public runtime::IntrusiveTask {
 
     auto with_stack(os::MemoryAllocation stack) -> void;
 
-    auto with_runtime(runtime::IRuntime* rt) -> void;
-    auto runtime() const -> runtime::IRuntime*;
+    auto with_runtime(rt::IRuntime* rt) -> void;
+    auto runtime() const -> rt::IRuntime*;
 
     auto suspend(Awaiter) -> void;
 
@@ -42,7 +42,7 @@ class Cord: public runtime::IntrusiveTask {
   private:
     os::MemoryAllocation _stack;
 
-    runtime::IRuntime* _runtime {nullptr};
+    rt::IRuntime* _runtime {nullptr};
     Coroutine _coroutine;
     Awaiter _awaiter;
 };

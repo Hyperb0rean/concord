@@ -1,6 +1,6 @@
 #pragma once
 
-namespace concord::runtime {
+namespace concord::rt {
 struct ITask {
     virtual auto run() noexcept -> void = 0;
 
