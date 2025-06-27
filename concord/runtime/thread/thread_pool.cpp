@@ -3,7 +3,6 @@
 #include "concord/runtime/thread/thread_pool.hpp"
 
 #include "concord/runtime/task.hpp"
-#include "fmt/base.h"
 
 namespace {
 thread_local concord::rt::thread::ThreadPool* pool = nullptr;
@@ -16,7 +15,7 @@ ThreadPool::~ThreadPool() {
 }
 
 auto ThreadPool::run() -> void {
-    _workers.reserve(_threads);
+    _workers.resize(_threads);
     for (auto& worker : _workers) {
         worker = std::thread([&] {
             pool = this;

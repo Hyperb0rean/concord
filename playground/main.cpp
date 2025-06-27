@@ -36,15 +36,15 @@ auto wait_test() -> void {
 
 std::size_t allocated;
 
-// auto operator new(std::size_t sz) -> void* {
-//     ++allocated;
-//     return malloc(sz);
-// }
+auto operator new(std::size_t sz) -> void* {
+    ++allocated;
+    return malloc(sz);
+}
 
-// auto operator new(std::size_t sz, std::align_val_t align) -> void* {
-//     ++allocated;
-//     return aligned_alloc(sz, static_cast<std::size_t>(align));
-// }
+auto operator new(std::size_t sz, std::align_val_t align) -> void* {
+    ++allocated;
+    return aligned_alloc(sz, static_cast<std::size_t>(align));
+}
 
 auto cord_test() -> void {
     using namespace concord::cord; // NOLINT
@@ -53,17 +53,16 @@ auto cord_test() -> void {
 
     int counter = 0;
 
-    go(rt, [&] {
+    go(rt, [=] mutable {
         for (int i = 0; i < 3; ++i) {
             fmt::println("Cord 1: {}", counter++);
             yield();
         }
     });
 
-    go(rt, [&] {
+    go(rt, [=] mutable {
         for (int i = 0; i < 3; ++i) {
             fmt::println("Cord 2: {}", counter++);
-            go([&] { fmt::println("Inner: {}", counter++); });
             yield();
         }
     });

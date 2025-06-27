@@ -7,7 +7,6 @@
 #include "axis/monad/maybe/type.hpp"
 #include "concord/os/sync/mutex.hpp"
 #include "concord/os/wait/wait.hpp"
-#include "fmt/base.h"
 
 namespace concord::rt::thread {
 
@@ -18,8 +17,7 @@ class UnboundedBlockingQueue {
         std::unique_lock guard {_mutex};
         _queue.push_back(item);
         auto&& token = os::prepare_wake(_size);
-        auto prev = _size.fetch_add(1, std::memory_order::relaxed);
-        assert(prev + 1 != sentinel);
+        _size.fetch_add(1, std::memory_order::relaxed);
         os::wake_one(std::move(token));
     }
 
