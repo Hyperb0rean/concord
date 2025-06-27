@@ -12,9 +12,7 @@ class Coroutine: public IRunnable {
     template<std::invocable F>
     Coroutine(F&& fn) : _func(std::forward<F>(fn)) {} // NOLINT
 
-    auto with_stack(Stack stack) -> void {
-        _callee_context.make(stack, this);
-    }
+    auto with_stack(Stack stack) -> void;
 
     auto resume() -> void;
 

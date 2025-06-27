@@ -9,24 +9,18 @@ namespace concord::os {
 
 class MemoryAllocation: private std::span<std::byte> {
   public:
-    static auto allocate(std::size_t size, std::size_t align)
-        -> MemoryAllocation;
+    static auto allocate(std::size_t size) -> MemoryAllocation;
     static auto deallocate(MemoryAllocation&&) noexcept -> void;
 
-    auto view() const noexcept -> std::span<std::byte> {
-        return {data(), size()};
-    }
+    auto view() const noexcept -> std::span<std::byte>;
 
     MemoryAllocation() = default;
 
   private:
-    MemoryAllocation(std::byte* ptr, std::size_t size, std::size_t align) :
-        std::span<std::byte> {ptr, size},
-        _align {align} {}
+    MemoryAllocation(std::byte* ptr, std::size_t size) :
+        std::span<std::byte> {ptr, size} {}
 
     auto protect() -> void;
-
-    std::size_t _align;
 };
 
 extern std::size_t page_size;

@@ -4,6 +4,10 @@
 
 namespace concord::cord {
 
+auto Coroutine::with_stack(Stack stack) -> void {
+    _callee_context.make(stack, this);
+}
+
 auto Coroutine::resume() -> void {
     _caller_context.switch_to(_callee_context);
 }

@@ -16,15 +16,14 @@ namespace concord::os {
 
 std::size_t page_size = system_page_size;
 
-auto MemoryAllocation::allocate(std::size_t size, std::size_t align)
-    -> MemoryAllocation {
+auto MemoryAllocation::allocate(std::size_t size) -> MemoryAllocation {
     auto* ptr = mmap(
         nullptr,
         size,
         PROT_READ | PROT_WRITE,
         MAP_ANONYMOUS | MAP_PRIVATE
     );
-    MemoryAllocation allocation = {ptr, size, align};
+    MemoryAllocation allocation = {ptr, size};
     allocation.protect();
     return allocation;
 }
@@ -36,6 +35,10 @@ auto MemoryAllocation::protect() -> void {
 auto MemoryAllocation::deallocate(MemoryAllocation&& allocation) noexcept
     -> void {
     munmap(allocation.data(), allocation.size());
+}
+
+auto MemoryAllocation::view() const noexcept -> std::span<std::byte> {
+    return {data(), size()};
 }
 
 } // namespace concord::os

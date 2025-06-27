@@ -6,7 +6,7 @@
 namespace concord::cord {
 template<typename F>
 auto go(runtime::IRuntime& rt, F&& fn) -> void {
-    auto stack = StackAllocator::allocate(Cord::stack_size, alignof(Cord));
+    auto stack = StackAllocator::allocate(Cord::stack_size);
     auto view = stack.view();
     auto* task = new (view.data() + view.size() - sizeof(Cord))
         concord::cord::Cord {std::forward<F>(fn)};
