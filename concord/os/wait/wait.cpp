@@ -50,6 +50,6 @@ auto wake_one(WakeToken token) -> void {
 }
 
 auto wake_all(WakeToken token) -> void {
-    wake(token.location, std::numeric_limits<uint32_t>::max());
+    wake(token.location, std::numeric_limits<int>::max());
 }
 } // namespace concord::os

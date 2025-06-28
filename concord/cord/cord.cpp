@@ -33,8 +33,7 @@ auto Cord::spawn() -> void {
 }
 
 auto Cord::resume() -> void {
-    // TODO
-    // run() ?
+    _runtime->spawn(this);
 }
 
 auto Cord::self() -> Cord& {

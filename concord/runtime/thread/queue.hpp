@@ -6,6 +6,7 @@
 #include "axis/container/intrusive_list.hpp"
 #include "concord/os/sync/mutex.hpp"
 #include "concord/os/wait/wait.hpp"
+#include "fmt/base.h"
 
 namespace concord::rt::thread {
 
@@ -23,24 +24,24 @@ class UnboundedBlockingQueue {
     auto pop() -> T* {
         std::unique_lock guard {_mutex};
         uint32_t size = _size.load(std::memory_order::relaxed);
-        while (size == 0 && size != sentinel) {
+        while (_queue.is_empty() && !_closed) {
             guard.unlock();
-            size = os::wait(_size, size, std::memory_order::relaxed);
+            os::wait(_size, size, std::memory_order::relaxed);
             guard.lock();
         }
         if (_queue.is_empty()) {
             return nullptr;
         }
         auto* item = _queue.pop_front();
-        auto prev = _size.fetch_sub(1, std::memory_order::relaxed);
-        assert(prev != 0);
+        _size.fetch_sub(1, std::memory_order::relaxed);
         return item;
     }
 
     auto close() -> void {
         std::unique_lock guard {_mutex};
+        _closed = true;
         auto&& token = os::prepare_wake(_size);
-        _size.store(sentinel, std::memory_order::relaxed);
+        _size.fetch_add(1, std::memory_order::relaxed);
         os::wake_all(std::move(token));
     }
 
@@ -51,6 +52,7 @@ class UnboundedBlockingQueue {
         std::hardware_destructive_interference_size;
 
     std::atomic<std::uint32_t> _size {0};
+    bool _closed {false};
     axis::IntrusiveList<T> _queue;
 
     alignas(cache_line_lize * 2) os::sync::Mutex _mutex;

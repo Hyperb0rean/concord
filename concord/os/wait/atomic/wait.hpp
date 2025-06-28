@@ -1,6 +1,8 @@
 #pragma once
 #include <atomic>
 
+#include "fmt/base.h"
+
 namespace {
 auto wait(uint32_t* addr, uint32_t old) -> int;
 }

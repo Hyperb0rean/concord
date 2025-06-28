@@ -48,10 +48,9 @@ auto operator new(std::size_t sz, std::align_val_t align) -> void* {
 
 auto cord_test() -> void {
     using namespace concord::cord; // NOLINT
-    concord::rt::thread::ThreadPool rt {4};
+    concord::rt::thread::ThreadPool rt {10};
 
     std::atomic<int> counter = 0;
-    rt.run();
 
     go(rt, [&] mutable {
         for (int i = 0; i < 3; ++i) {
@@ -66,6 +65,7 @@ auto cord_test() -> void {
             yield();
         }
     });
+    rt.run();
 
     rt.stop();
 
