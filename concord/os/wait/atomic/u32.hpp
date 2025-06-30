@@ -20,7 +20,7 @@ class AtomicRefUint32 {
         return atomic_value;
     }
 
-    auto location() const noexcept -> uint32_t* {
+    auto get() const noexcept -> uint32_t* {
         return reinterpret_cast<uint32_t*>(_atomic);
     }
 
@@ -28,4 +28,4 @@ class AtomicRefUint32 {
     std::atomic<uint32_t>* _atomic;
 };
 
-} // namespace concord::syscall::atomic
+} // namespace concord::os::atomic

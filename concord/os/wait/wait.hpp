@@ -55,12 +55,12 @@ struct [[nodiscard]] WakeToken {
 };
 
 inline auto prepare_wake(std::atomic<uint32_t>& atomic) -> WakeToken {
-    return {atomic::AtomicRefUint32 {atomic}.location()};
+    return {atomic::AtomicRefUint32 {atomic}.get()};
 }
 
 template<atomic::AtomicHalfUint64 Half>
 auto prepare_wake(atomic::AtomicRefUint64<Half> atomic_ref) -> WakeToken {
-    return {atomic_ref.location()};
+    return {atomic_ref.get()};
 }
 
 auto wake_one(WakeToken token) -> void;

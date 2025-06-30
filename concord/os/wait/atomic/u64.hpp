@@ -34,7 +34,7 @@ class AtomicRefUint64 {
         }
     }
 
-    auto location() const noexcept -> uint32_t* {
+    auto get() const noexcept -> uint32_t* {
         if constexpr (is_low_half()) {
             return low_half_location();
         } else {

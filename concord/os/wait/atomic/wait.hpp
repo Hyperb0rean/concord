@@ -13,7 +13,7 @@ auto wait(AtomicT atom_ref, uint32_t old, std::memory_order mo) ->
     typename AtomicT::Type {
     typename AtomicT::Type atomic_curr_value = 0;
     do {
-        ::wait(atom_ref.location(), old);
+        ::wait(atom_ref.get(), old);
         atomic_curr_value = atom_ref.load(mo);
     } while (AtomicT::value(atomic_curr_value) == old);
 
