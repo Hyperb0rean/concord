@@ -23,23 +23,14 @@ auto WaitGroup::done() -> void {
 }
 
 auto WaitGroup::wait() -> void {
-    uint64_t state = _state.load(std::memory_order::acquire);
+    uint64_t state = _state.fetch_add(1, std::memory_order::acquire);
     while (state >> 32 != 0) {
-        if (_state.compare_exchange_weak(
-                state,
-                state + 1,
-                std::memory_order::acq_rel,
-                std::memory_order::acquire
-            )) {
-            state = os::wait(
-                atomic::AtomicRefUint64<atomic::AtomicHalfUint64::High>(_state),
-                state >> 32,
-                std::memory_order::acquire
-            );
-        }
+        state = os::wait(
+            atomic::AtomicRefUint64<atomic::AtomicHalfUint64::High>(_state),
+            state >> 32,
+            std::memory_order::acquire
+        );
     }
-    if (state != 0) {
-        _state.store(0, std::memory_order::release);
-    }
+    _state.store(0, std::memory_order::release);
 }
 } // namespace concord::os::sync

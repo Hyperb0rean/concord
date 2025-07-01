@@ -9,6 +9,7 @@
 #include "concord/cord/go.hpp"
 #include "concord/cord/stack.hpp"
 #include "concord/cord/suspend.hpp"
+#include "concord/cord/sync/event.hpp"
 #include "concord/os/wait/wait.hpp"
 #include "concord/runtime/loop/loop.hpp"
 #include "concord/runtime/thread/thread_pool.hpp"
@@ -36,23 +37,25 @@ auto wait_test() -> void {
 
 std::size_t allocated;
 
-auto operator new(std::size_t sz) -> void* {
-    ++allocated;
-    return malloc(sz);
-}
+// auto operator new(std::size_t sz) -> void* {
+//     ++allocated;
+//     return malloc(sz);
+// }
 
-auto operator new(std::size_t sz, std::align_val_t align) -> void* {
-    ++allocated;
-    return aligned_alloc(sz, static_cast<std::size_t>(align));
-}
+// auto operator new(std::size_t sz, std::align_val_t align) -> void* {
+//     ++allocated;
+//     return aligned_alloc(sz, static_cast<std::size_t>(align));
+// }
 
 auto cord_test() -> void {
     using namespace concord::cord; // NOLINT
     concord::rt::thread::ThreadPool rt {1};
 
+    sync::Event ev;
     std::atomic<int> counter = 0;
 
     go(rt, [&] mutable {
+        ev.wait();
         for (int i = 0; i < 3; ++i) {
             fmt::println("Cord 1: {}", counter++);
             yield();
@@ -62,8 +65,8 @@ auto cord_test() -> void {
     go(rt, [&] mutable {
         for (int i = 0; i < 3; ++i) {
             fmt::println("Cord 2: {}", counter++);
-            yield();
         }
+        ev.fire();
     });
     rt.run();
 
