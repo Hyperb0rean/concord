@@ -11,7 +11,7 @@ namespace detail {
       public:
         // NB: no explicit see
         // https://github.com/facebook/folly/blob/main/folly/ScopeGuard.h
-        // NOLINTNEXTLINE
+        // NOLINTNEXTLINE(google-explicit-constructor)
         Defer(F&& f) : _func(std::forward<F>(f)) {}
 
         // Non copyable
@@ -34,5 +34,5 @@ namespace detail {
 } // namespace axis
 
 #define AXIS_DEFER \
-    [[maybe_unused]] ::axis::detail::Defer AXIS_ANONYMOUS(axis_defer \
-    ) = [&]() noexcept
+    [[maybe_unused]] ::axis::detail::Defer AXIS_ANONYMOUS(axis_defer) = [&]( \
+    ) noexcept

@@ -27,25 +27,6 @@ class MPSCStack {
         return true;
     }
 
-    auto pop() -> T* {
-        Node* new_head;
-        Node* old_head = head();
-        do {
-            if (old_head == nullptr) {
-                return nullptr;
-            }
-            new_head = old_head->_next;
-        } while (!_head.compare_exchange_weak(
-            old_head,
-            new_head,
-            std::memory_order::acq_rel,
-            std::memory_order::acquire
-        ));
-
-        old_head->reset();
-        return old_head;
-    }
-
     template<class F>
     auto close(F&& callback) -> void {
         Node* tail = _head.exchange(&_stub, std::memory_order::acq_rel);
@@ -57,10 +38,6 @@ class MPSCStack {
             callback(tail->item());
             tail = next_tail;
         }
-    }
-
-    auto is_empty [[nodiscard]] () const noexcept -> bool {
-        return head() == nullptr;
     }
 
     auto is_closed [[nodiscard]] () const noexcept -> bool {
