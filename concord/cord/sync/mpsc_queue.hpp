@@ -25,7 +25,7 @@ class MPSCQueue {
 
     auto pop() -> T* {
         if (tail() == nullptr) {
-            Clear([this](T* item) {
+            clear([this](T* item) {
                 Node* new_tail = static_cast<Node*>(item);
                 new_tail->_next = _tail;
                 _tail = new_tail;
@@ -48,6 +48,16 @@ class MPSCQueue {
 
     auto tail [[nodiscard]] () const noexcept -> Node* {
         return _tail;
+    }
+
+    template<class F>
+    auto clear(F&& callback) -> void {
+        Node* tail = _head.exchange(nullptr);
+        while (tail != nullptr) {
+            Node* next_tail = tail->_next;
+            callback(tail->item());
+            tail = next_tail;
+        }
     }
 
     Node* _tail {nullptr};

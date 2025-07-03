@@ -52,7 +52,10 @@ auto Cord::run() noexcept -> void {
         StackAllocator::dellocate(stack);
         Current::set(nullptr);
     } else {
-        _awaiter(CordHandle {this});
+        auto handle = _awaiter(CordHandle {this});
+        if (handle.is_valid()) {
+            handle.release()->run();
+        }
     }
 }
 

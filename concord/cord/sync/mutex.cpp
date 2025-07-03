@@ -6,7 +6,7 @@ auto Mutex::lock() noexcept -> void {
         _runner = &Cord::self();
         return;
     }
-    Cord::self().suspend([&](CordHandle self) {
+    Cord::self().suspend([this](CordHandle self) {
         _wait_queue.push(static_cast<rt::IntrusiveTask*>(self.get()));
     });
 }
