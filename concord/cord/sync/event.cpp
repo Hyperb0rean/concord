@@ -16,7 +16,7 @@ auto Event::wait() noexcept -> void {
 
 auto Event::fire() noexcept -> void {
     _wait_queue.close([](rt::IntrusiveTask* handle) {
-        static_cast<Cord*>(handle)->resume();
+        static_cast<Cord*>(handle)->spawn();
     });
 }
 

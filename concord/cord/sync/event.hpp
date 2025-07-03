@@ -1,7 +1,7 @@
 #pragma once
 
 #include "concord/cord/cord.hpp"
-#include "mpsc_stack.hpp"
+#include "concord/cord/sync/mpsc_stack.hpp"
 
 namespace concord::cord::sync {
 

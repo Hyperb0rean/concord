@@ -33,7 +33,9 @@ auto Cord::spawn() -> void {
 }
 
 auto Cord::resume() -> void {
-    _runtime->spawn(this);
+    Cord::self().suspend([this](CordHandle) -> CordHandle {
+        return CordHandle {this};
+    });
 }
 
 auto Cord::self() -> Cord& {

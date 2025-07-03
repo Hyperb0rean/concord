@@ -16,15 +16,32 @@ class Awaiter: private std::move_only_function<CordHandle(CordHandle)> {
 
     template<typename F> // NOLINTNEXTLINE(google-explicit-constructor)
     Awaiter(F&& func)
-        requires std::is_invocable_r_v<CordHandle, F, CordHandle>
+        requires requires(F f, CordHandle h) {
+            { f(h) } -> std::same_as<CordHandle>;
+        }
         : Base(std::forward<F>(func)) {}
 
     template<typename F> // NOLINTNEXTLINE(google-explicit-constructor)
     Awaiter(F&& func)
-        requires std::is_invocable_r_v<void, F, CordHandle>
+        requires requires(F f, CordHandle h) {
+            { f(h) } -> std::same_as<void>;
+        }
         :
         Base([f = std::forward<F>(func)](CordHandle handle) {
             f(handle);
+            return CordHandle::invalid();
+        }) {}
+
+    template<typename F> // NOLINTNEXTLINE(google-explicit-constructor)
+    Awaiter(F&& func)
+        requires requires(F f, CordHandle h) {
+            { f(h) } -> std::same_as<bool>;
+        }
+        :
+        Base([f = std::forward<F>(func)](CordHandle handle) {
+            if (f(handle)) {
+                return handle;
+            }
             return CordHandle::invalid();
         }) {}
 };

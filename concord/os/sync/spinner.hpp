@@ -1,5 +1,8 @@
 #pragma once
 
+// TODO: platform independent
+#include <unistd.h>
+
 #include <cstddef>
 
 namespace concord::os::sync {
@@ -11,6 +14,7 @@ struct Spinner {
     }
 
     auto operator()() noexcept -> void {
+        pause();
         ++_spins;
     }
 
