@@ -1,7 +1,5 @@
 #include "coroutine.hpp"
 
-#include <utility>
-
 namespace concord::cord {
 
 auto Coroutine::with_stack(Stack stack) -> void {
@@ -21,10 +19,10 @@ auto Coroutine::is_completed() const -> bool {
 }
 
 auto Coroutine::run() noexcept -> void {
+    _callee_context.before_run();
     _func();
     _is_completed = true;
 
-    _callee_context.switch_to(_caller_context);
-    std::unreachable();
+    _callee_context.exit_to(_caller_context);
 }
 } // namespace concord::cord

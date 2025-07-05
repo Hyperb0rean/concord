@@ -39,19 +39,31 @@ auto wait_test() -> void {
 
 std::size_t allocated;
 
-// auto operator new(std::size_t sz) -> void* {
-//     ++allocated;
-//     return malloc(sz);
-// }
+auto operator new(std::size_t sz) -> void* {
+    ++allocated;
+    return malloc(sz);
+}
 
-// auto operator new(std::size_t sz, std::align_val_t align) -> void* {
-//     ++allocated;
-//     return aligned_alloc(sz, static_cast<std::size_t>(align));
-// }
+auto operator new(std::size_t sz, std::align_val_t align) -> void* {
+    ++allocated;
+    return aligned_alloc(sz, static_cast<std::size_t>(align));
+}
+
+auto operator delete(void* ptr) noexcept -> void {
+    free(ptr);
+}
+
+auto operator delete(void* ptr, std::size_t) noexcept -> void {
+    free(ptr);
+}
+
+auto operator delete(void* ptr, std::align_val_t) noexcept -> void {
+    free(ptr);
+}
 
 auto cord_test() -> void {
     using namespace concord::cord; // NOLINT
-    concord::rt::thread::ThreadPool rt {10};
+    concord::rt::thread::ThreadPool rt {2};
 
     sync::Mutex mu;
     int counter = 0;

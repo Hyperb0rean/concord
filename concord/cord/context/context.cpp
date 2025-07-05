@@ -1,5 +1,7 @@
 #include "context.hpp"
 
+#include <utility>
+
 #include "concord/cord/runnable.hpp"
 #include "concord/cord/stack.hpp"
 
@@ -28,6 +30,15 @@ auto Context::make(Stack stack, IRunnable* fn) noexcept -> void {
 
 auto Context::switch_to(Context& target) noexcept -> void {
     context_switch(&rsp, &target.rsp);
+}
+
+auto Context::exit_to(Context& target) noexcept -> void {
+    context_switch(&rsp, &target.rsp);
+    std::unreachable();
+}
+
+auto Context::before_run() noexcept -> void {
+    // nop
 }
 
 } // namespace concord::cord::context

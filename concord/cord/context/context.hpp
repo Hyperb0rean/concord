@@ -8,7 +8,9 @@ struct Context {
     void* rsp;
 
     auto make(Stack stack, IRunnable* fn) noexcept -> void;
-    auto switch_to(Context& dest) noexcept -> void;
+    auto switch_to(Context& target) noexcept -> void;
+    auto exit_to [[noreturn]] (Context& target) noexcept -> void;
+    auto before_run() noexcept -> void;
 };
 } // namespace concord::cord::context
 

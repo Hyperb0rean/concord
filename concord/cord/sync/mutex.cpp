@@ -17,13 +17,13 @@ auto Mutex::try_lock() noexcept -> bool {
 
 auto Mutex::unlock() noexcept -> void {
     if (_combiner == nullptr) {
+        _combiner = &Cord::self();
         while (auto* handle = _wait_queue.pop()) {
-            _combiner = &Cord::self();
             _runner = static_cast<Cord*>(handle);
             _runner->resume();
             _runner->spawn();
-            _combiner = nullptr;
         }
+        _combiner = nullptr;
         // <-- preempts: Here is the problem with queue may not be already empty.
         _lock.unlock();
         return;

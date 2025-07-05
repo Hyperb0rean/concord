@@ -8,6 +8,12 @@
 namespace concord::cord {
 
 class Coroutine: public IRunnable {
+#if defined(__SANITIZE_ADDRESS__)
+    using Context = context::Sanitized;
+#else
+    using Context = context::Context;
+#endif
+
   public:
     template<std::invocable F>
     Coroutine(F&& fn) : _func(std::forward<F>(fn)) {} // NOLINT
@@ -27,8 +33,8 @@ class Coroutine: public IRunnable {
 
     std::move_only_function<void()> _func;
 
-    context::Context _callee_context;
-    context::Context _caller_context;
+    Context _callee_context;
+    Context _caller_context;
 };
 
 } // namespace concord::cord
