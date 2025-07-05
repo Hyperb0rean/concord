@@ -11,6 +11,7 @@
 #include "concord/cord/suspend.hpp"
 #include "concord/cord/sync/event.hpp"
 #include "concord/cord/sync/mutex.hpp"
+#include "concord/os/sync/wait_group.hpp"
 #include "concord/os/wait/wait.hpp"
 #include "concord/runtime/loop/loop.hpp"
 #include "concord/runtime/thread/thread_pool.hpp"
@@ -55,7 +56,7 @@ auto cord_test() -> void {
     sync::Mutex mu;
     int counter = 0;
 
-    go(rt, [&] mutable {
+    go(rt, [&] {
         for (int i = 0; i < 3; ++i) {
             std::lock_guard guard {mu};
             fmt::println("Cord 1: {}", counter++);
@@ -63,12 +64,13 @@ auto cord_test() -> void {
         }
     });
 
-    go(rt, [&] mutable {
+    go(rt, [&] {
+        std::lock_guard guard {mu};
         for (int i = 0; i < 3; ++i) {
-            std::lock_guard guard {mu};
             fmt::println("Cord 2: {}", counter++);
         }
     });
+
     rt.run();
 
     rt.stop();

@@ -14,6 +14,12 @@ class Awaiter: private std::move_only_function<CordHandle(CordHandle)> {
 
     Awaiter() = default;
 
+    Awaiter(Awaiter const&) = delete;
+    auto operator=(Awaiter const&) -> Awaiter& = delete;
+
+    Awaiter(Awaiter&&) = default;
+    auto operator=(Awaiter&&) -> Awaiter& = default;
+
     template<typename F> // NOLINTNEXTLINE(google-explicit-constructor)
     Awaiter(F&& func)
         requires requires(F f, CordHandle h) {
@@ -27,7 +33,7 @@ class Awaiter: private std::move_only_function<CordHandle(CordHandle)> {
             { f(h) } -> std::same_as<void>;
         }
         :
-        Base([f = std::forward<F>(func)](CordHandle handle) {
+        Awaiter([f = std::forward<F>(func)](CordHandle handle) {
             f(handle);
             return CordHandle::invalid();
         }) {}
@@ -35,10 +41,10 @@ class Awaiter: private std::move_only_function<CordHandle(CordHandle)> {
     template<typename F> // NOLINTNEXTLINE(google-explicit-constructor)
     Awaiter(F&& func)
         requires requires(F f, CordHandle h) {
-            { f(h) } -> std::same_as<bool>;
+            { func(h) } -> std::same_as<bool>;
         }
         :
-        Base([f = std::forward<F>(func)](CordHandle handle) {
+        Awaiter([f = std::forward<F>(func)](CordHandle handle) {
             if (f(handle)) {
                 return handle;
             }

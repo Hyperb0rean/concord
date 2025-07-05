@@ -28,7 +28,7 @@ class Cord: public rt::IntrusiveTask {
     auto with_runtime(rt::IRuntime* rt) -> void;
     auto runtime() const -> rt::IRuntime*;
 
-    auto suspend(Awaiter) -> void;
+    auto suspend(Awaiter&&) -> void;
 
     auto spawn() -> void;
     auto resume() -> void;

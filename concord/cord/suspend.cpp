@@ -10,6 +10,6 @@ auto suspend(Awaiter awaiter) -> void {
 }
 
 auto yield() -> void {
-    suspend([](CordHandle handle) { handle.resume(); });
+    suspend([](CordHandle handle) { handle.spawn(); });
 }
 } // namespace concord::cord

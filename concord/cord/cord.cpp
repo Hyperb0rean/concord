@@ -22,7 +22,7 @@ auto Cord::runtime() const -> rt::IRuntime* {
     return _runtime;
 }
 
-auto Cord::suspend(Awaiter awaiter) -> void {
+auto Cord::suspend(Awaiter&& awaiter) -> void {
     _awaiter = std::move(awaiter);
     _coroutine.suspend();
     Current::set(this);
