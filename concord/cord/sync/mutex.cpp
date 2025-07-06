@@ -6,9 +6,21 @@ auto Mutex::lock() noexcept -> void {
         _runner = &Cord::self();
         return;
     }
-    Cord::self().suspend([this](CordHandle self) {
-        _wait_queue.push(static_cast<rt::IntrusiveTask*>(self.get()));
-    });
+
+    struct LockAwaiter final: IAwaiter {
+        auto await(CordHandle self) -> CordHandle final {
+            _mutex->_wait_queue.push(
+                static_cast<rt::IntrusiveTask*>(self.get())
+            );
+            return CordHandle::invalid();
+        }
+
+        explicit LockAwaiter(Mutex* mutex) : _mutex(mutex) {}
+
+        Mutex* _mutex;
+    } awaiter {this};
+
+    Cord::self().suspend(&awaiter);
 }
 
 auto Mutex::try_lock() noexcept -> bool {

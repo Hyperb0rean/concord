@@ -28,7 +28,7 @@ class Cord: public rt::IntrusiveTask {
     auto with_runtime(rt::IRuntime* rt) -> void;
     auto runtime() const -> rt::IRuntime*;
 
-    auto suspend(Awaiter&&) -> void;
+    auto suspend(IAwaiter*) -> void;
 
     auto spawn() -> void;
     auto resume() -> void;
@@ -44,6 +44,6 @@ class Cord: public rt::IntrusiveTask {
 
     rt::IRuntime* _runtime {nullptr};
     Coroutine _coroutine;
-    Awaiter _awaiter;
+    IAwaiter* _awaiter;
 };
 } // namespace concord::cord

@@ -6,12 +6,21 @@ auto Event::wait() noexcept -> void {
     if (_wait_queue.is_closed()) {
         return;
     }
-    Cord::self().suspend([&](CordHandle self) {
-        if (!_wait_queue.push(self.get())) {
-            // TODO: LIFO
-            self.resume();
+
+    struct EventAwaiter final: IAwaiter {
+        auto await(CordHandle self) -> CordHandle final {
+            if (!_event->_wait_queue.push(self.get())) {
+                return self;
+            }
+            return CordHandle::invalid();
         }
-    });
+
+        explicit EventAwaiter(Event* event) : _event(event) {}
+
+        Event* _event;
+    } awaiter {this};
+
+    Cord::self().suspend(&awaiter);
 }
 
 auto Event::fire() noexcept -> void {

@@ -22,8 +22,8 @@ auto Cord::runtime() const -> rt::IRuntime* {
     return _runtime;
 }
 
-auto Cord::suspend(Awaiter&& awaiter) -> void {
-    _awaiter = std::move(awaiter);
+auto Cord::suspend(IAwaiter* awaiter) -> void {
+    _awaiter = awaiter;
     _coroutine.suspend();
     Current::set(this);
 }
@@ -33,9 +33,17 @@ auto Cord::spawn() -> void {
 }
 
 auto Cord::resume() -> void {
-    Cord::self().suspend([this](CordHandle) -> CordHandle {
-        return CordHandle {this};
-    });
+    struct Awaiter final: IAwaiter {
+        auto await(CordHandle) -> CordHandle final {
+            return _callee;
+        }
+
+        explicit Awaiter(CordHandle callee) : _callee(callee) {}
+
+        CordHandle _callee;
+    } awaiter {CordHandle {this}};
+
+    Cord::self().suspend(&awaiter);
 }
 
 auto Cord::self() -> Cord& {
@@ -52,7 +60,7 @@ auto Cord::run() noexcept -> void {
         StackAllocator::dellocate(stack);
         Current::set(nullptr);
     } else {
-        auto handle = _awaiter(CordHandle {this});
+        auto handle = _awaiter->await(CordHandle {this});
         if (handle.is_valid()) {
             handle.release()->run();
         }

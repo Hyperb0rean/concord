@@ -4,7 +4,7 @@
 
 namespace concord::cord {
 
-auto suspend(Awaiter) -> void;
+auto suspend(IAwaiter*) -> void;
 
 void yield();
 

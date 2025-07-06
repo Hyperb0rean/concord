@@ -5,11 +5,18 @@
 
 namespace concord::cord {
 
-auto suspend(Awaiter awaiter) -> void {
-    Cord::self().suspend(std::move(awaiter));
+auto suspend(IAwaiter* awaiter) -> void {
+    Cord::self().suspend(awaiter);
 }
 
 auto yield() -> void {
-    suspend([](CordHandle handle) { handle.spawn(); });
+    struct YieldAwaiter final: IAwaiter {
+        auto await(CordHandle handle) -> CordHandle {
+            handle.spawn();
+            return CordHandle::invalid();
+        }
+    } awaiter;
+
+    suspend(&awaiter);
 }
 } // namespace concord::cord
