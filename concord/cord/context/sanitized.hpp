@@ -1,5 +1,6 @@
 #pragma once
 
+#include "axis/core/sanitizer.hpp"
 #include "concord/cord/context/context.hpp"
 #include "concord/cord/runnable.hpp"
 #include "concord/cord/stack.hpp"

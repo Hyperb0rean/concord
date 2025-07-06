@@ -3,13 +3,14 @@
 #include <functional>
 
 #include "concord/cord/context/context.hpp"
+#include "concord/cord/context/sanitized.hpp"
 #include "concord/cord/runnable.hpp"
 
 namespace concord::cord {
 
 class Coroutine: public IRunnable {
 #if defined(__SANITIZE_ADDRESS__)
-    using Context = context::Sanitized;
+    using Context = context::SanitizedContext;
 #else
     using Context = context::Context;
 #endif
