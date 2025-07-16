@@ -28,12 +28,12 @@ concept Thunk = requires(T thunk, Demand<typename T::ValueType> demand) {
 };
 
 template<Thunk T>
-using ValueOf = T::value_type;
+using value_of = T::value_type; // NOLINT(readability-identifier-naming)
 
 template<typename F, typename V>
-concept Future = Thunk<F> and std::same_as<ValueOf<F>, V>;
+concept Future = Thunk<F> and std::same_as<value_of<F>, V>;
 
-template<Thunk Future, Continuation<ValueOf<Future>> Demand>
+template<Thunk Future, Continuation<value_of<Future>> Demand>
 using Materialize =
     decltype(std::declval<Future>().materialize(std::declval<Demand>()));
 

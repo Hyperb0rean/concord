@@ -18,7 +18,7 @@ class InitializationCell final {
 
   public:
     auto get() && noexcept(std::is_nothrow_move_constructible_v<T>) -> T {
-        auto&& val = std::move(*pointer());
+        T val {std::move(*pointer())};
         std::destroy_at(pointer());
         return val;
     }
@@ -40,13 +40,20 @@ class InitializationCell final {
 
     auto operator=(InitializationCell&& other
     ) noexcept(std::is_nothrow_move_constructible_v<T>) -> InitializationCell& {
-        std::destroy_at(pointer());
-        emplace(std::move(*other.pointer()));
+        InitializationCell tmp {std::move(other)};
+        swap(tmp, *this);
     };
+
+    friend void swap(InitializationCell& lhs, InitializationCell& rhs) noexcept(
+        std::is_nothrow_swappable_v<T>
+    ) {
+        using std::swap;
+        swap(*lhs.pointer(), *rhs.pointer());
+    }
 
   private:
     auto pointer() noexcept -> T* {
-        return reinterpret_cast<T*>(std::addressof(_storage));
+        return std::launder(reinterpret_cast<T*>(std::addressof(_storage)));
     }
 
     alignas(T) std::byte _storage[sizeof(T)] {};
