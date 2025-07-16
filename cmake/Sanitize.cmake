@@ -27,3 +27,8 @@ if(CMAKE_BUILD_TYPE MATCHES "Tsan")
     add_compile_options(${TSAN_COMPILE_FLAGS})
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${TSAN_LINK_FLAGS}")
 endif()
+
+
+# Sanitizer interface
+
+file(GLOB_RECURSE LIB_SANITIZER "/lib/clang/20/include/sanitizer" *.h)

@@ -5,17 +5,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # https://clang.llvm.org/docs/DiagnosticsReference.html
-add_compile_options(-Wall -Wextra -Wpedantic -g -fno-omit-frame-pointer)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -g -fno-omit-frame-pointer")
 
 # Turn warnings into errors
-add_compile_options(-Wno-language-extension-token)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-language-extension-token")
 
-add_compile_options(-Wno-unused-command-line-argument -Wno-unused-function)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-command-line-argument -Wno-unused-function")
 
-add_compile_options(-gdwarf-4)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-4")
 
 # libc++
-add_compile_options(-stdlib=libstdc++)
-add_link_options(-stdlib=libstdc++)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libstdc++")
 
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
