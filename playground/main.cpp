@@ -1,41 +1,11 @@
-#include <atomic>
-#include <axis/monad/maybe.hpp>
-#include <axis/monad/result.hpp>
-#include <iostream>
-#include <thread>
 
-#include "concord/cord/context/context.hpp"
-#include "concord/cord/cord.hpp"
 #include "concord/cord/go.hpp"
-#include "concord/cord/stack.hpp"
 #include "concord/cord/suspend.hpp"
-#include "concord/cord/sync/event.hpp"
 #include "concord/cord/sync/mutex.hpp"
-#include "concord/os/sync/wait_group.hpp"
-#include "concord/os/wait/wait.hpp"
-#include "concord/runtime/loop/loop.hpp"
+#include "concord/future/get.hpp"
+#include "concord/future/ready.hpp"
 #include "concord/runtime/thread/thread_pool.hpp"
 #include "fmt/core.h"
-
-auto wait_test() -> void {
-    std::atomic<uint64_t> flag {0};
-    auto producer = std::thread([&] {
-        using namespace std::chrono_literals;
-        std::this_thread::sleep_for(1s);
-        auto&& token =
-            concord::os::prepare_wake(concord::os::AtomicRefUint64Low {flag});
-        std::cout << "Awaken" << std::endl;
-        flag.store(1);
-        concord::os::wake_one(std::move(token));
-    });
-    std::cout << "Sleept" << std::endl;
-    concord::os::wait(
-        concord::os::AtomicRefUint64Low {flag},
-        0,
-        std::memory_order::seq_cst
-    );
-    producer.join();
-}
 
 std::size_t allocated;
 
@@ -90,7 +60,18 @@ auto cord_test() -> void {
     fmt::println("allocations: {}", allocated);
 }
 
+auto future_test() -> void {
+    using namespace concord::future; //NOLINT
+    auto f = Ready(1488);
+
+    auto val = Get(std::move(f));
+
+    fmt::println("val: {}", val);
+    assert(val == 1488);
+
+    fmt::println("allocations: {}", allocated);
+}
+
 auto main() -> int {
-    cord_test();
-    // wait_test();
+    future_test();
 }

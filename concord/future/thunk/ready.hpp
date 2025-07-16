@@ -8,7 +8,7 @@ template<typename V>
 struct [[nodiscard]] Ready {
     using value_type = V; // NOLINT(readability-identifier-naming)
 
-    value_type value;
+    [[no_unique_address]] value_type value;
 
     explicit Ready(V v) : value(std::move(v)) {}
 
@@ -20,9 +20,9 @@ struct [[nodiscard]] Ready {
     auto operator=(Ready&&) -> Ready& = default;
 
     template<Continuation<V> Consumer>
-    struct ReadyComputation {
-        Consumer consumer;
-        V value;
+    struct Computation {
+        [[no_unique_address]] Consumer consumer;
+        [[no_unique_address]] V value;
 
         void call() {
             consumer.resume(std::move(value));
@@ -30,8 +30,8 @@ struct [[nodiscard]] Ready {
     };
 
     template<Continuation<V> Consumer>
-    auto materialize(Consumer&& c) -> Computation auto {
-        return ReadyComputation<Consumer> {
+    auto materialize(Consumer&& c) -> future::Computation auto {
+        return Computation<Consumer> {
             std::forward<Consumer>(c),
             std::move(value)
         };

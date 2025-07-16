@@ -39,15 +39,16 @@ struct [[nodiscard]] GetTerminator {
         return std::move(value).get();
     }
 
+    // TODO: Actually may not use Event in case synchronization is not neaded, should make static dispath
     os::sync::Event event;
     axis::InitializationCell<value_type> value;
     Computation comp;
 };
 
-template<Thunk Future>
-auto get(Future f) -> value_of<Future> {
+template<Thunk Future> //NOLINTNEXTLINE(readability-identifier-naming)
+auto Get(Future f) -> value_of<Future> {
     GetTerminator<Future> get {std::move(f)};
-    return get.get();
+    return std::move(get).get();
 }
 
 } // namespace concord::future

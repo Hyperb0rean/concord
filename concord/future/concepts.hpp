@@ -5,6 +5,8 @@
 
 namespace concord::future {
 
+struct Unit {};
+
 template<typename C>
 concept Computation = requires(C comp) {
     { comp.call() } -> std::same_as<void>;
@@ -21,7 +23,7 @@ struct Demand {
 };
 
 template<typename T>
-concept Thunk = requires(T thunk, Demand<typename T::ValueType> demand) {
+concept Thunk = requires(T thunk, Demand<typename T::value_type> demand) {
     typename T::value_type;
 
     { thunk.materialize(std::move(demand)) } -> Computation;

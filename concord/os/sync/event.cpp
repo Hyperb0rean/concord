@@ -8,10 +8,10 @@
 namespace concord::os::sync {
 
 auto Event::wait() noexcept -> void {
-    auto state = _state.load(std::memory_order::acquire);
-    [[maybe_unused]] auto fired =
+    if (auto state = _state.load(std::memory_order::acquire);
+        state != State::Fired) {
         os::wait(_state, state, std::memory_order::acquire);
-    assert(fired == State::Fired);
+    }
 }
 
 auto Event::fire() noexcept -> void {
