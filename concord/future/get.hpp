@@ -10,6 +10,7 @@ template<Thunk Future>
 struct [[nodiscard]] GetTerminator {
     // NOLINTNEXTLINE(readability-identifier-naming)
     using value_type = value_of<Future>;
+    using State = state_of<Future>;
 
     // Non-copyable
     GetTerminator(const GetTerminator&) = delete;
@@ -21,7 +22,7 @@ struct [[nodiscard]] GetTerminator {
     struct GetDemand {
         GetTerminator* self;
 
-        auto resume(value_type val) -> void {
+        auto resume(value_type val, State) -> void {
             self->value.emplace(std::move(val));
             self->event.fire();
         }

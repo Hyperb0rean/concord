@@ -6,6 +6,9 @@ namespace concord::future::thunk {
 
 struct [[nodiscard]] Just {
     using value_type = Unit; // NOLINT(readability-identifier-naming)
+
+    using State = Unit;
+
     Just() = default;
 
     // Non-copyable
@@ -17,10 +20,10 @@ struct [[nodiscard]] Just {
 
     template<Continuation<Unit> Consumer>
     struct Computation {
-        Consumer consumer;
+        [[no_unique_address]] Consumer consumer;
 
         void call() {
-            consumer.resume(Unit {});
+            consumer.resume(Unit {}, State {});
         }
     };
 

@@ -1,12 +1,15 @@
 #pragma once
 
 #include "concord/future/concepts.hpp"
+#include "concord/future/future_local.hpp"
 
 namespace concord::future::thunk {
 
 template<typename V>
 struct [[nodiscard]] Ready {
     using value_type = V; // NOLINT(readability-identifier-naming)
+
+    using State = Unit;
 
     [[no_unique_address]] value_type value;
 
@@ -25,7 +28,7 @@ struct [[nodiscard]] Ready {
         [[no_unique_address]] V value;
 
         void call() {
-            consumer.resume(std::move(value));
+            consumer.resume(std::move(value), State {});
         }
     };
 
