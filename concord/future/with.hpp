@@ -1,10 +1,18 @@
 #pragma once
 
-#include "concord/future/comb/with.hpp"
+#include "concord/future/concepts.hpp"
+#include "concord/future/thunk/with.hpp"
 
 namespace concord::future {
-template<typename S> //NOLINTNEXTLINE(readability-identifier-naming)
-auto With(S state) {
-    return comb::With<S> {std::move(state)};
-}
+
+template<typename Bind>
+struct With {
+    [[no_unique_address]] Bind state_bind;
+
+    template<Thunk InputFuture>
+    auto then(InputFuture&& f) && {
+        return thunk::With {std::move(f), std::move(state_bind)};
+    }
+};
+
 } // namespace concord::future

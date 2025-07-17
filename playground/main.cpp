@@ -3,7 +3,10 @@
 #include "concord/cord/suspend.hpp"
 #include "concord/cord/sync/mutex.hpp"
 #include "concord/future/get.hpp"
+#include "concord/future/pipe.hpp"
 #include "concord/future/ready.hpp"
+#include "concord/future/with.hpp"
+#include "concord/runtime/loop/loop.hpp"
 #include "concord/runtime/thread/thread_pool.hpp"
 #include "fmt/core.h"
 
@@ -62,7 +65,10 @@ auto cord_test() -> void {
 
 auto future_test() -> void {
     using namespace concord::future; //NOLINT
-    auto f = Ready(1488);
+    concord::rt::loop::Loop rt {};
+
+    auto f = Ready(1488) //
+        | With(Runtime {&rt});
 
     auto val = Get(std::move(f));
 

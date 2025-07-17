@@ -7,11 +7,10 @@ namespace concord::future::thunk {
 
 template<typename V>
 struct [[nodiscard]] Ready {
-    using value_type = V; // NOLINT(readability-identifier-naming)
-
+    using ValueType = V;
     using State = Unit;
 
-    [[no_unique_address]] value_type value;
+    [[no_unique_address]] ValueType value;
 
     explicit Ready(V v) : value(std::move(v)) {}
 
@@ -22,17 +21,17 @@ struct [[nodiscard]] Ready {
     Ready(Ready&&) = default;
     auto operator=(Ready&&) -> Ready& = default;
 
-    template<Continuation<V> Consumer>
+    template<Continuation<ValueType, Unit> Consumer>
     struct Computation {
         [[no_unique_address]] Consumer consumer;
-        [[no_unique_address]] V value;
+        [[no_unique_address]] ValueType value;
 
         void call() {
-            consumer.resume(std::move(value), State {});
+            consumer.resume(std::move(value), Unit {});
         }
     };
 
-    template<Continuation<V> Consumer>
+    template<Continuation<ValueType, Unit> Consumer>
     auto materialize(Consumer&& c) -> future::Computation auto {
         return Computation<Consumer> {
             std::forward<Consumer>(c),

@@ -8,8 +8,7 @@ namespace concord::future {
 
 template<Thunk Future>
 struct [[nodiscard]] GetTerminator {
-    // NOLINTNEXTLINE(readability-identifier-naming)
-    using value_type = value_of<Future>;
+    using ValueType = value_of<Future>;
     using State = state_of<Future>;
 
     // Non-copyable
@@ -19,22 +18,21 @@ struct [[nodiscard]] GetTerminator {
     GetTerminator(GetTerminator&&) = default;
     auto operator=(GetTerminator&&) -> GetTerminator& = default;
 
-    struct GetDemand {
+    struct Demand {
         GetTerminator* self;
 
-        auto resume(value_type val, State) -> void {
+        auto resume(ValueType val, State) -> void {
             self->value.emplace(std::move(val));
             self->event.fire();
         }
     };
 
-    using Computation = Materialize<Future, GetDemand>;
+    using Computation = Materialize<Future, Demand>;
 
-    explicit GetTerminator(Future&& f) :
-        comp(f.materialize(GetDemand {this})) {}
+    explicit GetTerminator(Future&& f) : comp(f.materialize(Demand {this})) {}
 
-    auto get() && noexcept(std::is_nothrow_move_constructible_v<value_type>)
-        -> value_type {
+    auto get() noexcept(std::is_nothrow_move_constructible_v<ValueType>)
+        -> ValueType {
         comp.call();
         event.wait();
         return std::move(value).get();
@@ -42,14 +40,14 @@ struct [[nodiscard]] GetTerminator {
 
     // TODO: Actually may not use Event in case synchronization is not neaded, should make static dispath
     os::sync::Event event;
-    axis::InitializationCell<value_type> value;
+    axis::InitializationCell<ValueType> value;
     Computation comp;
 };
 
 template<Thunk Future> //NOLINTNEXTLINE(readability-identifier-naming)
-auto Get(Future f) -> value_of<Future> {
-    GetTerminator<Future> get {std::move(f)};
-    return std::move(get).get();
+auto Get(Future&& f) -> value_of<Future> {
+    GetTerminator pin {std::move(f)};
+    return pin.get();
 }
 
 } // namespace concord::future

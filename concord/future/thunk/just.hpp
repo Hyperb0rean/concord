@@ -5,8 +5,7 @@
 namespace concord::future::thunk {
 
 struct [[nodiscard]] Just {
-    using value_type = Unit; // NOLINT(readability-identifier-naming)
-
+    using ValueType = Unit;
     using State = Unit;
 
     Just() = default;
@@ -18,16 +17,16 @@ struct [[nodiscard]] Just {
     Just(Just&&) = default;
     auto operator=(Just&&) -> Just& = default;
 
-    template<Continuation<Unit> Consumer>
+    template<Continuation<Unit, Unit> Consumer>
     struct Computation {
         [[no_unique_address]] Consumer consumer;
 
         void call() {
-            consumer.resume(Unit {}, State {});
+            consumer.resume(Unit {}, Unit {});
         }
     };
 
-    template<Continuation<Unit> Consumer>
+    template<Continuation<Unit, Unit> Consumer>
     auto materialize(Consumer&& c) -> future::Computation auto {
         return Computation<Consumer> {std::forward<Consumer>(c)};
     }

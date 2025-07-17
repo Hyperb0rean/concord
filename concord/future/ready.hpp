@@ -8,7 +8,7 @@ namespace concord::future {
 template<typename V>
 
 //NOLINTNEXTLINE(readability-identifier-naming)
-auto Ready(V value) -> Future<V> auto {
+auto Ready(V value) -> Future<V, Unit> auto {
     return thunk::Ready<V> {std::move(value)};
 }
 
