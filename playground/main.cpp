@@ -3,6 +3,8 @@
 #include "concord/cord/suspend.hpp"
 #include "concord/cord/sync/mutex.hpp"
 #include "concord/future/get.hpp"
+#include "concord/future/just.hpp"
+#include "concord/future/map.hpp"
 #include "concord/future/pipe.hpp"
 #include "concord/future/ready.hpp"
 #include "concord/future/with.hpp"
@@ -67,8 +69,12 @@ auto future_test() -> void {
     using namespace concord::future; //NOLINT
     concord::rt::loop::Loop rt {};
 
-    auto f = Ready(1488) //
-        | With(Runtime {&rt});
+    auto f = Just() //
+        | With(Runtime {&rt}) //
+        | Map([](Unit) {
+                 fmt::println("in loop");
+                 return 1488;
+             });
 
     auto val = Get(std::move(f));
 

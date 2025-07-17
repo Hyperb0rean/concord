@@ -23,13 +23,15 @@ struct Demand {
 };
 
 template<typename T>
-concept Thunk =
-    requires(T thunk, Demand<typename T::ValueType, typename T::State> demand) {
-        typename T::ValueType;
-        typename T::State;
+concept Thunk = requires(
+    std::type_identity_t<T>&& thunk,
+    Demand<typename T::ValueType, typename T::State> demand
+) {
+    typename T::ValueType;
+    typename T::State;
 
-        { thunk.materialize(std::move(demand)) } -> Computation;
-    };
+    { thunk.materialize(std::move(demand)) } -> Computation;
+};
 
 template<Thunk T>
 using value_of = T::ValueType; // NOLINT(readability-identifier-naming)

@@ -26,7 +26,7 @@ struct Runtime {
         return std::make_tuple(runtime, std::forward<S>(state));
     }
 
-    auto operator()(Unit) -> rt::IRuntime* {
+    auto operator()(Unit) -> std::tuple<rt::IRuntime*> {
         return runtime;
     }
 };

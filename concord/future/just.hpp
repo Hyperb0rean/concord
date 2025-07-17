@@ -5,10 +5,8 @@
 
 namespace concord::future {
 
-template<typename V>
-
 //NOLINTNEXTLINE(readability-identifier-naming)
-auto Just() -> Future<V> auto {
+auto Just() -> Future<Unit, Unit> auto {
     return thunk::Just {};
 }
 
